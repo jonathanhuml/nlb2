@@ -5,7 +5,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-from ladys.plotting import (
+from nlb2.plotting import (
     model_color,
     model_label,
     model_marker,
@@ -44,9 +44,9 @@ def test_plot_context_can_write_png(tmp_path: Path):
 
 
 def test_experiment_plots_preserve_display_backend_and_open_figures(tmp_path: Path):
-    from ladys.experiment import _write_history_plots
-    from ladys.training import EpochReport
-    from ladys.types import StepResult
+    from nlb2.experiment import _write_history_plots
+    from nlb2.training import EpochReport
+    from nlb2.types import StepResult
 
     original_backend = matplotlib.get_backend()
     try:

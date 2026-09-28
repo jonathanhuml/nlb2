@@ -55,7 +55,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: pypi
-      url: https://pypi.org/project/ladys/
+      url: https://pypi.org/project/nlb2/
     permissions:
       id-token: write
     steps:
@@ -75,7 +75,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: testpypi
-      url: https://test.pypi.org/project/ladys/
+      url: https://test.pypi.org/project/nlb2/
     permissions:
       id-token: write
     steps:

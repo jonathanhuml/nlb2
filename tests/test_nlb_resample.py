@@ -5,7 +5,7 @@ import pandas as pd
 import pytest
 from nlb_tools.nwb_interface import NWBDataset
 
-from ladys.datasets._nlb_resample import resample_nwb_dataset
+from nlb2.datasets._nlb_resample import resample_nwb_dataset
 
 
 def dataset_with_data(data):

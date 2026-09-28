@@ -6,8 +6,8 @@ import torch
 from scipy.signal import convolve
 from scipy.signal.windows import gaussian
 
-from ladys.datasets import ChaoticRNNDataset, ChaoticRNNDatasetConfig, LorenzDataset, LorenzDatasetConfig
-from ladys.preprocessing import smooth_firing_rate
+from nlb2.datasets import ChaoticRNNDataset, ChaoticRNNDatasetConfig, LorenzDataset, LorenzDatasetConfig
+from nlb2.preprocessing import smooth_firing_rate
 
 
 @pytest.mark.parametrize("overrides", [

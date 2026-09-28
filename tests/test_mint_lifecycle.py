@@ -5,16 +5,16 @@ import numpy as np
 import pytest
 import torch
 
-from ladys.config import ExperimentConfig
-from ladys.datasets import LorenzDataset, LorenzDatasetConfig, NLBDatasetConfig
-from ladys.experiment import Experiment
-from ladys.metrics import evaluate_model
-from ladys.models.mint import MINTConfig, InterpOptions, fit_poisson_interp
-from ladys.preprocessing import PreprocessedDataset, PreprocessingConfig
+from nlb2.config import ExperimentConfig
+from nlb2.datasets import LorenzDataset, LorenzDatasetConfig, NLBDatasetConfig
+from nlb2.experiment import Experiment
+from nlb2.metrics import evaluate_model
+from nlb2.models.mint import MINTConfig, InterpOptions, fit_poisson_interp
+from nlb2.preprocessing import PreprocessedDataset, PreprocessingConfig
 from torch.utils.data import DataLoader, Subset
-from ladys.training import TrainerConfig
-from ladys.training.strategies import build_strategy
-from ladys.types import ModelOutput
+from nlb2.training import TrainerConfig
+from nlb2.training.strategies import build_strategy
+from nlb2.types import ModelOutput
 
 
 CUDA_DEVICE = pytest.param(
@@ -148,7 +148,7 @@ def test_mint_training_is_inside_recorded_epoch_and_resume_does_not_refit(tmp_pa
     experiment, _ = _nlb_experiment(tmp_path)
     experiment.config.save_training_state = True
     experiment.config.dataset.split = "val"
-    from ladys.models.mint import MINT
+    from nlb2.models.mint import MINT
 
     original_fit = MINT.fit_training_data
     training_calls = []
@@ -273,7 +273,7 @@ def test_nlb_experiment_exports_same_counts_as_direct_predictions(tmp_path):
 
 def test_cli_routes_synthetic_mint_through_standard_training(tmp_path, monkeypatch):
     from argparse import Namespace
-    from ladys.cli import run_command
+    from nlb2.cli import run_command
 
     config = ExperimentConfig(
         dataset=LorenzDatasetConfig(neurons=2, num_inits=1, num_trials=3,
@@ -282,7 +282,7 @@ def test_cli_routes_synthetic_mint_through_standard_training(tmp_path, monkeypat
         trainer=TrainerConfig(epochs=1), preprocessing=PreprocessingConfig(),
         output_dir=str(tmp_path), run_name="cli-mint", batch_size=2,
     )
-    monkeypatch.setattr("ladys.cli.build_experiment_config", lambda args: config)
+    monkeypatch.setattr("nlb2.cli.build_experiment_config", lambda args: config)
     assert run_command(Namespace(config=None, resume_from=None)) == 0
     assert (tmp_path / "cli-mint" / "model.pt").exists()
 

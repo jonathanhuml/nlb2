@@ -6,10 +6,10 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         
         
-        <link rel="canonical" href="https://zkunkworks.com/ladys/optimizer_contract/">
+        <link rel="canonical" href="https://zkunkworks.com/nlb2/optimizer_contract/">
         <link rel="shortcut icon" href="../assets/favicon.ico">
         
-        <title>Optimizer - LaDyS</title>
+        <title>Optimizer - NLB2</title>
         <link href="../css/bootstrap.min.css" rel="stylesheet">
         <link href="../css/fontawesome.min.css" rel="stylesheet">
         <link href="../css/brands.min.css" rel="stylesheet">
@@ -26,7 +26,7 @@
     <body>
         <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
             <div class="container">
-                <a class="navbar-brand" href="..">LaDyS</a>
+                <a class="navbar-brand" href="..">NLB2</a>
                 <!-- Expander button -->
                 <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -35,6 +35,9 @@
                 <!-- Expanded navigation -->
                 <div id="navbar-collapse" class="navbar-collapse collapse">
 <ul class="nav navbar-nav">
+  <li class="nav-item">
+    <a href="../tuning/" class="nav-link">Hyperparameter Tuning</a>
+  </li>
   <li class="nav-item dropdown">
     <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">Models</a>
     <ul class="dropdown-menu">
@@ -149,10 +152,24 @@ second full E-step over the dataset is a second benchmark epoch.</p>
 negative log likelihood and runs one standard PyTorch backward/optimizer step.
 The older full-dataset EM adapter remains available by setting
 <code>optimization.name: em</code>.</p>
+<p>Library methods use <code>optimization.name: library_fit</code>. With MINT's
+<code>train_source: lfads</code>, each epoch trains the rate estimator for one full pass
+and updates the trajectory library. <code>trainer.epochs</code> controls the number of
+these updates. Training history records MINT's training and validation Poisson
+losses and the estimator's objective under <code>train_metrics.trajectory_loss</code>.
+Resumable checkpoints include estimator weights and optimizer state; fitted
+model checkpoints include the library needed for inference.</p>
+<p>MINT's default <code>train_source: h5</code> and PSTH estimate a statistical library
+directly. They use one full-data fitting epoch, calling
+<code>model.fit_training_data(train_loader, device=device)</code>, followed by training
+and validation loss measurement. Zero-epoch library training is rejected.
+The model field <code>lfads_epochs</code> is retained for direct fitting helpers and
+legacy reproduction runners; standard experiments use <code>trainer.epochs</code>.</p>
 <p>The reporting contract is shared across strategies: every epoch returns a
 <code>StepResult</code>, and benchmark plots use <code>seconds_per_epoch</code>. The benchmark
-records optimizer epoch time only; validation and downstream metric computation
-are not included in <code>seconds_per_epoch</code>.</p></div>
+records training epoch time, including library learning and training-loss
+measurement; validation and downstream metric computation are not included
+in <code>seconds_per_epoch</code>.</p></div>
             </div>
         </div>
 

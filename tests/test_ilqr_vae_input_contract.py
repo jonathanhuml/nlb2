@@ -6,10 +6,10 @@ import pytest
 import torch
 from torch.utils.data import DataLoader
 
-from ladys.datasets.chaotic_rnn import ChaoticRNNDataset, ChaoticRNNDatasetConfig
-from ladys.datasets.lorenz import LorenzDataset, LorenzDatasetConfig
-from ladys.models.ilqr_vae import ILQRVAEConfig
-from ladys.preprocessing import PreprocessedDataset, PreprocessingConfig, PreprocessingStepConfig
+from nlb2.datasets.chaotic_rnn import ChaoticRNNDataset, ChaoticRNNDatasetConfig
+from nlb2.datasets.lorenz import LorenzDataset, LorenzDatasetConfig
+from nlb2.models.ilqr_vae import ILQRVAEConfig
+from nlb2.preprocessing import PreprocessedDataset, PreprocessingConfig, PreprocessingStepConfig
 
 
 @pytest.mark.parametrize("dataset_name", ["lorenz", "chaotic_rnn"])

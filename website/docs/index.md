@@ -1,6 +1,6 @@
-# LaDyS
+# NLB2
 
-LaDyS (Latent Dynamical Systems) provides PyTorch benchmark scaffolding for
+NLB2 provides PyTorch benchmark scaffolding for
 latent variable models of neural dynamics.
 
 ## Documentation
@@ -11,17 +11,17 @@ latent variable models of neural dynamics.
 
 ## CLI
 
-Run a full LaDyS experiment with:
+Run a full NLB2 experiment with:
 
 ```bash
-ladys run -d lorenz -m cassm
+nlb2 run -d lorenz -m cassm
 ```
 
 The public registries include synthetic datasets such as `lorenz` and
 `chaotic_rnn`, plus model entries such as `ilqr_vae`, `lfads`, and `ndt`.
 
 This builds the dataset, model, trainer, evaluation metrics, and a self-contained
-run folder through the public `ladys.Experiment` orchestration API.
+run folder through the public `nlb2.Experiment` orchestration API.
 
 Model pages are generated from model class docstrings and config defaults:
 

@@ -2,9 +2,9 @@ from pathlib import Path
 
 import torch
 
-from ladys.config import load_experiment_config
-from ladys.models.ilqr_vae import ILQRVAEConfig
-from ladys.training.strategies import GradientStrategy
+from nlb2.config import load_experiment_config
+from nlb2.models.ilqr_vae import ILQRVAEConfig
+from nlb2.training.strategies import GradientStrategy
 
 
 def test_ilqr_vae_nlb_configs_are_self_contained():

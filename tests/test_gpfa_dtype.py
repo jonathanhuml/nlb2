@@ -3,7 +3,7 @@
 import pytest
 import torch
 
-from ladys.models import GPFAConfig
+from nlb2.models import GPFAConfig
 
 
 def make_model(dtype, *, init_method="kaiming_normal"):

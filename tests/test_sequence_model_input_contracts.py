@@ -5,11 +5,11 @@ from types import SimpleNamespace
 import pytest
 import torch
 
-from ladys.datasets.chaotic_rnn import ChaoticRNNDataset, ChaoticRNNDatasetConfig
-from ladys.datasets.lorenz import LorenzDataset, LorenzDatasetConfig
-from ladys.models.lfads import LFADSConfig
-from ladys.models.stndt import STNDTConfig
-from ladys.preprocessing import PreprocessedDataset, PreprocessingConfig, PreprocessingStepConfig
+from nlb2.datasets.chaotic_rnn import ChaoticRNNDataset, ChaoticRNNDatasetConfig
+from nlb2.datasets.lorenz import LorenzDataset, LorenzDatasetConfig
+from nlb2.models.lfads import LFADSConfig
+from nlb2.models.stndt import STNDTConfig
+from nlb2.preprocessing import PreprocessedDataset, PreprocessingConfig, PreprocessingStepConfig
 
 
 def _config(name, **overrides):

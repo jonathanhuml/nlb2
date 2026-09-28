@@ -5,7 +5,7 @@ from types import SimpleNamespace
 import pytest
 import torch
 
-from ladys.models.ilqr_vae import ILQRVAEConfig
+from nlb2.models.ilqr_vae import ILQRVAEConfig
 
 
 def _model(**overrides):

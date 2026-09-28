@@ -7,14 +7,14 @@ import numpy as np
 import pytest
 import torch
 
-from ladys.config import ExperimentConfig, load_experiment_config
-from ladys.datasets import LorenzDatasetConfig
-from ladys.experiment import Experiment
-from ladys.metrics import evaluate_model
-from ladys.models import BGPFAConfig
-from ladys.preprocessing import PreprocessingConfig
-from ladys.training import TrainerConfig
-from ladys.training.strategies import build_strategy
+from nlb2.config import ExperimentConfig, load_experiment_config
+from nlb2.datasets import LorenzDatasetConfig
+from nlb2.experiment import Experiment
+from nlb2.metrics import evaluate_model
+from nlb2.models import BGPFAConfig
+from nlb2.preprocessing import PreprocessingConfig
+from nlb2.training import TrainerConfig
+from nlb2.training.strategies import build_strategy
 
 
 def small_config(**kwargs):

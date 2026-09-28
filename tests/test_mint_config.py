@@ -3,9 +3,9 @@ from pathlib import Path
 import numpy as np
 import torch
 
-from ladys.config import load_experiment_config
-from ladys.models.base import BaseModelConfig
-from ladys.models.mint import MINTConfig, get_mint_config
+from nlb2.config import load_experiment_config
+from nlb2.models.base import BaseModelConfig
+from nlb2.models.mint import MINTConfig, get_mint_config
 
 
 def test_mint_model_is_registered():
@@ -43,7 +43,7 @@ def test_mint_lorenz_recipe_trains_trajectories_for_50_epochs():
 
 
 def test_mint_python_and_yaml_defaults_use_training_spikes():
-    from ladys.utils.yaml import load_yaml
+    from nlb2.utils.yaml import load_yaml
 
     for config in [MINTConfig(), MINTConfig.model_validate(load_yaml("configs/model/mint.yaml"))]:
         assert config.train_source == "h5"

@@ -6,10 +6,10 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         
         
-        <link rel="canonical" href="https://zkunkworks.com/ladys/models/lfads/">
+        <link rel="canonical" href="https://zkunkworks.com/nlb2/models/lfads/">
         <link rel="shortcut icon" href="../../assets/favicon.ico">
         
-        <title>LFADS - LaDyS</title>
+        <title>LFADS - NLB2</title>
         <link href="../../css/bootstrap.min.css" rel="stylesheet">
         <link href="../../css/fontawesome.min.css" rel="stylesheet">
         <link href="../../css/brands.min.css" rel="stylesheet">
@@ -26,7 +26,7 @@
     <body>
         <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
             <div class="container">
-                <a class="navbar-brand" href="../..">LaDyS</a>
+                <a class="navbar-brand" href="../..">NLB2</a>
                 <!-- Expander button -->
                 <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -35,6 +35,9 @@
                 <!-- Expanded navigation -->
                 <div id="navbar-collapse" class="navbar-collapse collapse">
 <ul class="nav navbar-nav">
+  <li class="nav-item">
+    <a href="../../tuning/" class="nav-link">Hyperparameter Tuning</a>
+  </li>
   <li class="nav-item dropdown">
     <a href="#" class="nav-link dropdown-toggle active" aria-current="page" role="button" data-bs-toggle="dropdown" aria-expanded="false">Models</a>
     <ul class="dropdown-menu">
@@ -164,14 +167,14 @@
 <h2 id="source">Source</h2>
 <ul>
 <li>Registry name: <code>lfads</code></li>
-<li>Model class: <code>ladys.models.lfads.LFADS</code></li>
-<li>Config class: <code>ladys.models.lfads.LFADSConfig</code></li>
-<li>Source file: <code>src/ladys/models/lfads.py</code></li>
+<li>Model class: <code>nlb2.models.lfads.LFADS</code></li>
+<li>Config class: <code>nlb2.models.lfads.LFADSConfig</code></li>
+<li>Source file: <code>src/nlb2/models/lfads.py</code></li>
 </ul>
 <h2 id="when-to-use">When to use</h2>
 <p>Use LFADS as a nonlinear variational sequence model for neural population
 spike counts. This implementation adapts the LFADS demo architecture into
-the LaDyS model contract: bidirectional encoders infer a generator initial
+the NLB2 model contract: bidirectional encoders infer a generator initial
 condition and controller context, a generator GRU produces latent factors,
 and an exponential readout returns Poisson firing rates.</p>
 <h2 id="assumptions">Assumptions</h2>
@@ -210,6 +213,11 @@ reconstruction objective plus scheduled KL and optional recurrent L2 terms.</p>
 <td><code>generator_dim</code></td>
 <td><code>int</code></td>
 <td><code>64</code></td>
+</tr>
+<tr>
+<td><code>initial_condition_dim</code></td>
+<td><code>Optional[int]</code></td>
+<td><code>None</code></td>
 </tr>
 <tr>
 <td><code>inferred_input_dim</code></td>
@@ -282,6 +290,41 @@ reconstruction objective plus scheduled KL and optional recurrent L2 terms.</p>
 <td><code>5.0</code></td>
 </tr>
 <tr>
+<td><code>controller_posterior_logvar_min</code></td>
+<td><code>Optional[float]</code></td>
+<td><code>None</code></td>
+</tr>
+<tr>
+<td><code>controller_posterior_logvar_max</code></td>
+<td><code>Optional[float]</code></td>
+<td><code>None</code></td>
+</tr>
+<tr>
+<td><code>reconstruction_time_steps</code></td>
+<td><code>Optional[int]</code></td>
+<td><code>None</code></td>
+</tr>
+<tr>
+<td><code>controller_lag</code></td>
+<td><code>int</code></td>
+<td><code>0</code></td>
+</tr>
+<tr>
+<td><code>readout_neurons</code></td>
+<td><code>Optional[int]</code></td>
+<td><code>None</code></td>
+</tr>
+<tr>
+<td><code>output_neuron_start</code></td>
+<td><code>Optional[int]</code></td>
+<td><code>None</code></td>
+</tr>
+<tr>
+<td><code>output_neurons</code></td>
+<td><code>Optional[int]</code></td>
+<td><code>None</code></td>
+</tr>
+<tr>
 <td><code>use_log1p_encoder_inputs</code></td>
 <td><code>bool</code></td>
 <td><code>True</code></td>
@@ -297,6 +340,41 @@ reconstruction objective plus scheduled KL and optional recurrent L2 terms.</p>
 <td><code>1</code></td>
 </tr>
 <tr>
+<td><code>loss_scale</code></td>
+<td><code>float</code></td>
+<td><code>1.0</code></td>
+</tr>
+<tr>
+<td><code>reconstruction_reduce_mean</code></td>
+<td><code>bool</code></td>
+<td><code>False</code></td>
+</tr>
+<tr>
+<td><code>coordinated_dropout_rate</code></td>
+<td><code>float</code></td>
+<td><code>0.0</code></td>
+</tr>
+<tr>
+<td><code>coordinated_dropout_pass_rate</code></td>
+<td><code>float</code></td>
+<td><code>0.0</code></td>
+</tr>
+<tr>
+<td><code>coordinated_dropout_ic_enc_seq_len</code></td>
+<td><code>int</code></td>
+<td><code>0</code></td>
+</tr>
+<tr>
+<td><code>inferred_input_prior</code></td>
+<td><code>Literal['independent', 'autoregressive']</code></td>
+<td><code>'independent'</code></td>
+</tr>
+<tr>
+<td><code>inferred_input_prior_tau</code></td>
+<td><code>float</code></td>
+<td><code>10.0</code></td>
+</tr>
+<tr>
 <td><code>kl_weight_schedule_start</code></td>
 <td><code>int</code></td>
 <td><code>0</code></td>
@@ -305,6 +383,16 @@ reconstruction objective plus scheduled KL and optional recurrent L2 terms.</p>
 <td><code>kl_weight_schedule_dur</code></td>
 <td><code>int</code></td>
 <td><code>2000</code></td>
+</tr>
+<tr>
+<td><code>kl_g0_scale</code></td>
+<td><code>float</code></td>
+<td><code>1.0</code></td>
+</tr>
+<tr>
+<td><code>kl_u_scale</code></td>
+<td><code>float</code></td>
+<td><code>1.0</code></td>
 </tr>
 <tr>
 <td><code>l2_weight_schedule_start</code></td>

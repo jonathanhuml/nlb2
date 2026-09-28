@@ -4,13 +4,13 @@ from pathlib import Path
 import pytest
 import yaml
 
-from ladys.cli import main
-from ladys.config import ExperimentConfig, load_experiment_config
-from ladys.datasets import LorenzDatasetConfig
-from ladys.experiment import Experiment
-from ladys.models import GPFAConfig
-from ladys.preprocessing import PreprocessingConfig
-from ladys.training import TrainerConfig
+from nlb2.cli import main
+from nlb2.config import ExperimentConfig, load_experiment_config
+from nlb2.datasets import LorenzDatasetConfig
+from nlb2.experiment import Experiment
+from nlb2.models import GPFAConfig
+from nlb2.preprocessing import PreprocessingConfig
+from nlb2.training import TrainerConfig
 
 
 def test_experiment_writes_run_artifacts(tmp_path: Path):
@@ -187,7 +187,7 @@ def test_cli_runs_multiple_configs_with_shared_overrides(tmp_path: Path, capsys)
     ]) == 0
 
     output = capsys.readouterr().out
-    assert output.count("Wrote LaDyS run:") == 3
+    assert output.count("Wrote NLB2 run:") == 3
     for latent_dim, path in enumerate(paths, 1):
         run_dir = output_dir / path.stem
         saved = load_experiment_config(str(run_dir / "config.json"))

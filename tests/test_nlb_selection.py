@@ -2,13 +2,13 @@ import h5py
 import numpy as np
 import pytest
 
-from ladys.config import ExperimentConfig
-from ladys.datasets.nlb import NLBDatasetConfig
-from ladys.experiment import Experiment
-from ladys.models import GPFAConfig
-from ladys.nlb_eval import prepare_nlb_selection_target
-from ladys.preprocessing import PreprocessingConfig
-from ladys.training import TrainerConfig
+from nlb2.config import ExperimentConfig
+from nlb2.datasets.nlb import NLBDatasetConfig
+from nlb2.experiment import Experiment
+from nlb2.models import GPFAConfig
+from nlb2.nlb_eval import prepare_nlb_selection_target
+from nlb2.preprocessing import PreprocessingConfig
+from nlb2.training import TrainerConfig
 
 
 def _config(tmp_path, split="val", live_eval_interval=0):

@@ -1,71 +1,75 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
-         <loc>https://zkunkworks.com/ladys/</loc>
-         <lastmod>2026-07-12</lastmod>
+         <loc>https://zkunkworks.com/nlb2/</loc>
+         <lastmod>2026-09-28</lastmod>
     </url>
     <url>
-         <loc>https://zkunkworks.com/ladys/gpfa_port_notes/</loc>
-         <lastmod>2026-07-12</lastmod>
+         <loc>https://zkunkworks.com/nlb2/gpfa_port_notes/</loc>
+         <lastmod>2026-09-28</lastmod>
     </url>
     <url>
-         <loc>https://zkunkworks.com/ladys/model_output_contract/</loc>
-         <lastmod>2026-07-12</lastmod>
+         <loc>https://zkunkworks.com/nlb2/model_output_contract/</loc>
+         <lastmod>2026-09-28</lastmod>
     </url>
     <url>
-         <loc>https://zkunkworks.com/ladys/optimizer_contract/</loc>
-         <lastmod>2026-07-12</lastmod>
+         <loc>https://zkunkworks.com/nlb2/optimizer_contract/</loc>
+         <lastmod>2026-09-28</lastmod>
     </url>
     <url>
-         <loc>https://zkunkworks.com/ladys/models/</loc>
-         <lastmod>2026-07-12</lastmod>
+         <loc>https://zkunkworks.com/nlb2/tuning/</loc>
+         <lastmod>2026-09-28</lastmod>
     </url>
     <url>
-         <loc>https://zkunkworks.com/ladys/models/bgpfa/</loc>
-         <lastmod>2026-07-12</lastmod>
+         <loc>https://zkunkworks.com/nlb2/models/</loc>
+         <lastmod>2026-09-28</lastmod>
     </url>
     <url>
-         <loc>https://zkunkworks.com/ladys/models/cassm/</loc>
-         <lastmod>2026-07-12</lastmod>
+         <loc>https://zkunkworks.com/nlb2/models/bgpfa/</loc>
+         <lastmod>2026-09-28</lastmod>
     </url>
     <url>
-         <loc>https://zkunkworks.com/ladys/models/gpfa/</loc>
-         <lastmod>2026-07-12</lastmod>
+         <loc>https://zkunkworks.com/nlb2/models/cassm/</loc>
+         <lastmod>2026-09-28</lastmod>
     </url>
     <url>
-         <loc>https://zkunkworks.com/ladys/models/ilqr_vae/</loc>
-         <lastmod>2026-07-12</lastmod>
+         <loc>https://zkunkworks.com/nlb2/models/gpfa/</loc>
+         <lastmod>2026-09-28</lastmod>
     </url>
     <url>
-         <loc>https://zkunkworks.com/ladys/models/kalman/</loc>
-         <lastmod>2026-07-12</lastmod>
+         <loc>https://zkunkworks.com/nlb2/models/ilqr_vae/</loc>
+         <lastmod>2026-09-28</lastmod>
     </url>
     <url>
-         <loc>https://zkunkworks.com/ladys/models/langevin_flow/</loc>
-         <lastmod>2026-07-12</lastmod>
+         <loc>https://zkunkworks.com/nlb2/models/kalman/</loc>
+         <lastmod>2026-09-28</lastmod>
     </url>
     <url>
-         <loc>https://zkunkworks.com/ladys/models/lfads/</loc>
-         <lastmod>2026-07-12</lastmod>
+         <loc>https://zkunkworks.com/nlb2/models/langevin_flow/</loc>
+         <lastmod>2026-09-28</lastmod>
     </url>
     <url>
-         <loc>https://zkunkworks.com/ladys/models/mint/</loc>
-         <lastmod>2026-07-12</lastmod>
+         <loc>https://zkunkworks.com/nlb2/models/lfads/</loc>
+         <lastmod>2026-09-28</lastmod>
     </url>
     <url>
-         <loc>https://zkunkworks.com/ladys/models/ndt/</loc>
-         <lastmod>2026-07-12</lastmod>
+         <loc>https://zkunkworks.com/nlb2/models/mint/</loc>
+         <lastmod>2026-09-28</lastmod>
     </url>
     <url>
-         <loc>https://zkunkworks.com/ladys/models/psth/</loc>
-         <lastmod>2026-07-12</lastmod>
+         <loc>https://zkunkworks.com/nlb2/models/ndt/</loc>
+         <lastmod>2026-09-28</lastmod>
     </url>
     <url>
-         <loc>https://zkunkworks.com/ladys/models/smoothing/</loc>
-         <lastmod>2026-07-12</lastmod>
+         <loc>https://zkunkworks.com/nlb2/models/psth/</loc>
+         <lastmod>2026-09-28</lastmod>
     </url>
     <url>
-         <loc>https://zkunkworks.com/ladys/models/stndt/</loc>
-         <lastmod>2026-07-12</lastmod>
+         <loc>https://zkunkworks.com/nlb2/models/smoothing/</loc>
+         <lastmod>2026-09-28</lastmod>
+    </url>
+    <url>
+         <loc>https://zkunkworks.com/nlb2/models/stndt/</loc>
+         <lastmod>2026-09-28</lastmod>
     </url>
 </urlset>

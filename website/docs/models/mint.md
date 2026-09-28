@@ -2,14 +2,14 @@
 
 # MINT
 
-Mesh of Idealized Neural Trajectories adapted to the LaDyS API.
+Mesh of Idealized Neural Trajectories adapted to the NLB2 API.
 
 ## Source
 
 - Registry name: `mint`
-- Model class: `ladys.models.mint.MINT`
-- Config class: `ladys.models.mint.MINTConfig`
-- Source file: `src/ladys/models/mint.py`
+- Model class: `nlb2.models.mint.MINT`
+- Config class: `nlb2.models.mint.MINTConfig`
+- Source file: `src/nlb2/models/mint.py`
 
 ## Method
 
@@ -22,19 +22,19 @@ optional LFADS rate estimation has its own gradient training stage.
 
 ## NLB datasets
 
-The native LaDyS MINT port supports the three MINT/NLB datasets used in the
+The native NLB2 MINT port supports the three MINT/NLB datasets used in the
 original repository: `area2_bump`, `mc_maze`, and `mc_rtt`, plus a
-LaDyS-native `dmfc_rsg` adapter built from the NLB 5 ms H5 tensors. Area2
+NLB2-native `dmfc_rsg` adapter built from the NLB 5 ms H5 tensors. Area2
 and Maze smooth and average repeated condition-aligned trials; the RTT
 config trains LFADS from raw training spikes and fits single-trial rate
 trajectories. DMFC averages prepared condition-indexed trials. This H5
 adapter does not reproduce the original event-warped DMFC NWB procedure.
-Prepared NLB and Allen data use the standard `Experiment` and `ladys run`
+Prepared NLB and Allen data use the standard `Experiment` and `nlb2 run`
 fit/save/load workflow. Legacy NWB/MAT adapters remain explicit options.
 
 ## Synthetic datasets
 
-The synthetic Lorenz and chaotic-RNN adapters are LaDyS-specific trajectory
+The synthetic Lorenz and chaotic-RNN adapters are NLB2-specific trajectory
 builders. With the default `lorenz_library_source="smoothed_spikes"`, the
 library is estimated from training spikes by Gaussian smoothing and
 condition averaging. This keeps the comparison non-oracular while still
@@ -73,7 +73,7 @@ task-specific reproduction adapters.
 `lfads_epochs` controls the direct `fit_training_data` helper and legacy
 reproduction runners only.
 
-For synthetic Lorenz and chaotic-RNN tasks, LaDyS builds the MINT trajectory
+For synthetic Lorenz and chaotic-RNN tasks, NLB2 builds the MINT trajectory
 library from repeated training trials. With `train_source="h5"`, the default
 `lorenz_library_source="smoothed_spikes"` estimates library rates by
 Gaussian-smoothing training spikes and averaging by condition.

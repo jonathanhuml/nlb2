@@ -3,8 +3,8 @@ import numpy as np
 import pytest
 from torch.utils.data import DataLoader
 
-from ladys.data import available_datasets, build_dataset_config, make_dataset_splits
-from ladys.datasets import AllenVCNDatasetConfig
+from nlb2.data import available_datasets, build_dataset_config, make_dataset_splits
+from nlb2.datasets import AllenVCNDatasetConfig
 
 
 def test_allen_vcn_registry_and_loader(tmp_path):

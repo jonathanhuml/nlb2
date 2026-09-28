@@ -7,15 +7,15 @@ Thin wrapper around the bundled CASSM sparse filter/smoother.
 ## Source
 
 - Registry name: `cassm`
-- Model class: `ladys.models.cassm.CASSM`
-- Config class: `ladys.models.cassm.CASSMConfig`
-- Source file: `src/ladys/models/cassm.py`
+- Model class: `nlb2.models.cassm.CASSM`
+- Config class: `nlb2.models.cassm.CASSMConfig`
+- Source file: `src/nlb2/models/cassm.py`
 
 ## When to use
 
 Use CASSM when benchmarking computation-aware sparse state-space models
-against latent dynamics baselines. LaDyS keeps the compact filtering core
-inside `ladys.models` and maps it onto the shared model, loss, prediction,
+against latent dynamics baselines. NLB2 keeps the compact filtering core
+inside `nlb2.models` and maps it onto the shared model, loss, prediction,
 and device contracts.
 
 ## Inputs

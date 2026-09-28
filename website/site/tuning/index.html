@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        
+        <link rel="canonical" href="https://zkunkworks.com/nlb2/tuning/">
+        <link rel="shortcut icon" href="../assets/favicon.ico">
+        
+        <title>Hyperparameter Tuning - NLB2</title>
+        <link href="../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../css/brands.min.css" rel="stylesheet">
+        <link href="../css/solid.min.css" rel="stylesheet">
+        <link href="../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <link href="../stylesheets/minimal.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script>hljs.highlightAll();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="..">NLB2</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+<ul class="nav navbar-nav">
+  <li class="nav-item">
+    <a href="./" class="nav-link active" aria-current="page">Hyperparameter Tuning</a>
+  </li>
+  <li class="nav-item dropdown">
+    <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">Models</a>
+    <ul class="dropdown-menu">
+<li>
+  <a href="../models/" class="dropdown-item">Overview</a>
+</li>
+<li>
+  <a href="../models/bgpfa/" class="dropdown-item">BGPFA</a>
+</li>
+<li>
+  <a href="../models/cassm/" class="dropdown-item">CASSM</a>
+</li>
+<li>
+  <a href="../models/gpfa/" class="dropdown-item">GPFA</a>
+</li>
+<li>
+  <a href="../models/ilqr_vae/" class="dropdown-item">ILQR-VAE</a>
+</li>
+<li>
+  <a href="../models/kalman/" class="dropdown-item">Kalman</a>
+</li>
+<li>
+  <a href="../models/langevin_flow/" class="dropdown-item">LangevinFlow</a>
+</li>
+<li>
+  <a href="../models/lfads/" class="dropdown-item">LFADS</a>
+</li>
+<li>
+  <a href="../models/mint/" class="dropdown-item">MINT</a>
+</li>
+<li>
+  <a href="../models/ndt/" class="dropdown-item">NDT</a>
+</li>
+<li>
+  <a href="../models/psth/" class="dropdown-item">PSTH</a>
+</li>
+<li>
+  <a href="../models/stndt/" class="dropdown-item">STNDT</a>
+</li>
+<li>
+  <a href="../models/smoothing/" class="dropdown-item">Smoothing</a>
+</li>
+    </ul>
+  </li>
+  <li class="nav-item dropdown">
+    <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">Contracts</a>
+    <ul class="dropdown-menu">
+<li>
+  <a href="../model_output_contract/" class="dropdown-item">Model Output</a>
+</li>
+<li>
+  <a href="../optimizer_contract/" class="dropdown-item">Optimizer</a>
+</li>
+<li>
+  <a href="../gpfa_port_notes/" class="dropdown-item">GPFA Port Notes</a>
+</li>
+    </ul>
+  </li>
+</ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+<li class="nav-item">
+  <a href="/" class="nav-link zkunkworks-nav-link" aria-label="zkunkworks home">
+    <img class="zkunkworks-nav-logo" src="../assets/skunk.png" alt="" width="34" height="24">
+  </a>
+</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#hyperparameter-tuning" class="nav-link">Hyperparameter tuning</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#python-api" class="nav-link">Python API</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#a-study-recipe" class="nav-link">A study recipe</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#search-selection-and-budgets" class="nav-link">Search, selection, and budgets</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#reproduction-and-recovery" class="nav-link">Reproduction and recovery</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#experiment-reporting" class="nav-link">Experiment reporting</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="hyperparameter-tuning">Hyperparameter tuning</h1>
+<p><code>Experiment</code> executes one concrete configuration. <code>Study</code> uses Ray Tune to
+choose configurations, run them as ordinary experiments, and select by a
+declared validation metric. Ray is optional. In an existing NLB2 environment:</p>
+<pre><code class="language-bash">pip install &quot;ray[tune]&gt;=2.43,&lt;3&quot; &quot;optuna&gt;=3,&lt;5&quot;
+nlb2 tune -c configs/tuning/smoothing_lorenz.yaml
+</code></pre>
+<p>These dependencies are also declared in NLB2's <code>tuning</code> installation extra.</p>
+<p>The smoothing recipe is a small CPU workflow example. It samples four
+bandwidths, including the existing setting, and selects the lowest validation
+rate MSE. <code>configs/tuning/stndt_mc_maze.yaml</code> shows a full-budget GPU TPE study;
+it requires prepared MC_Maze validation data and runs 20 candidates across
+three training seeds, so it is a substantial training job.</p>
+<h2 id="python-api">Python API</h2>
+<pre><code class="language-python">from nlb2 import Study
+
+study = Study.from_config_path(&quot;configs/tuning/smoothing_lorenz.yaml&quot;)
+result = study.run()
+print(result.best_score)
+print(result.best_config_path)
+print(result.best_checkpoints)
+</code></pre>
+<p>You can also construct <code>StudyConfig(base=experiment_config, objective=...,
+search_space=...)</code> and pass it to <code>Study</code>. The base accepts an
+<code>ExperimentConfig</code> or a resolved experiment dictionary. <code>StudyResult.trials</code>
+contains successful, failed, and incomplete candidates. If no candidate
+finishes successfully, <code>best_config</code> and <code>best_score</code> are <code>None</code>; the CLI
+returns a nonzero status. <code>StudyResult.from_path(directory)</code> reads results
+without starting Ray.</p>
+<h2 id="a-study-recipe">A study recipe</h2>
+<pre><code class="language-yaml">base: ../experiment/real/mc_maze/stndt/stndt_mc_maze_nlb_5ms.yaml
+objective:
+  metric: co_bps
+  mode: max
+  checkpoint: best
+evaluation_interval: 50
+search_space:
+  model.optimization.lr:
+    distribution: loguniform
+    low: 0.0001
+    high: 0.01
+  model.dropout:
+    distribution: uniform
+    low: 0.0
+    high: 0.6
+algorithm: tpe
+scheduler: fifo
+num_samples: 20
+include_base: true
+training_seeds: [0, 1, 2]
+search_seed: 7
+evaluation_seed: 10000
+resources: {cpu: 4, gpu: 1}
+max_concurrent_trials: 1
+output_dir: studies
+name: stndt_mc_maze
+</code></pre>
+<p><code>base</code> can instead contain an inline experiment mapping. A referenced base
+file resolves relative to the study recipe. Data and model input paths resolve
+relative to the working directory at launch, matching <code>nlb2 run</code>; the study
+records absolute paths before Ray workers change directories.</p>
+<p>Supported distributions are <code>choice</code> with a <code>choices</code> list, <code>uniform</code>,
+<code>loguniform</code>, and <code>randint</code> with <code>low</code> and <code>high</code>. The integer upper bound is
+exclusive. Search paths use experiment YAML names, including
+<code>model.optimization.lr</code>, <code>trainer.batch_size</code>, and
+<code>preprocessing.observations.0.kern_sd_ms</code>. Preprocessing steps must already
+exist in the base. Unknown paths are rejected before launch.</p>
+<p>Data, data splits, input files, model identity, optimization strategy, seeds,
+and training budgets are fixed study settings. They cannot be search paths.
+Model and preprocessing fields retain their normal config validation, and
+every sampled candidate is revalidated before constructing its model.</p>
+<p>Use <code>parameter_sets</code> for coupled choices, such as compatible widths and head
+counts. Every set must specify the same fields; these fields cannot also
+appear in <code>search_space</code>:</p>
+<pre><code class="language-yaml">parameter_sets:
+  - {model.hidden_size: 128, model.num_heads: 2}
+  - {model.hidden_size: 192, model.num_heads: 3}
+</code></pre>
+<p>The base must lie inside the declared search space, including one of the
+parameter sets, when <code>include_base: true</code>. <code>points_to_evaluate</code> accepts complete
+parameter mappings for additional initial candidates. <code>num_samples</code> includes
+the base and these initial points. General conditional expressions and
+executable code in YAML are not supported.</p>
+<h2 id="search-selection-and-budgets">Search, selection, and budgets</h2>
+<p><code>algorithm: random</code> uses Ray's seeded random generator. <code>algorithm: tpe</code> uses
+Optuna's seeded TPE sampler through Ray. Both currently use FIFO scheduling:
+each candidate receives the base experiment's complete training budget.
+ASHA is deferred until model-specific learning curves and grace periods have
+been established.</p>
+<p>One Ray trial runs a candidate sequentially across every <code>training_seeds</code>
+entry. The search objective is the arithmetic mean of the completed seed
+scores. <code>score_std</code> is the sample standard deviation, or zero for one seed.
+Partial and failed candidates cannot win or supply TPE with an objective.
+Epoch reports remain available as progress and recovery checkpoints.</p>
+<p><code>checkpoint: last</code> scores the final model. <code>checkpoint: best</code> selects the
+best fresh validation evaluation within each seed run; it requires a positive
+evaluation interval for nonzero-epoch training. <code>evaluation_interval</code> overrides
+the base's <code>trainer.live_eval_interval</code>; otherwise the base setting is used.
+The model, metrics, predictions, and selected epoch refer to the same
+checkpoint. A missing or nonfinite objective fails that candidate.</p>
+<p>Zero-epoch methods still execute <code>fit_training_data</code> and final evaluation.
+CPU/GPU reservations apply to each candidate; this API supports a single CPU
+or single-GPU training process per seed run, with the requested CPU thread
+count. Concurrency limits work for both search algorithms. <code>time_budget_s</code>
+optionally sets a study-wide wall-clock limit; candidates cut off before all
+seed runs finish remain incomplete. Training budgets must be chosen for each
+model family: equal epochs do not imply equal compute. Recorded elapsed time
+includes preparation, fitting, validation, and artifact generation, while
+<code>history.csv</code> retains the existing optimizer-epoch timing definition.</p>
+<h2 id="reproduction-and-recovery">Reproduction and recovery</h2>
+<p>A study directory contains:</p>
+<ul>
+<li><code>study.json</code>: the fully resolved study recipe.</li>
+<li><code>provenance.json</code>: source and input-file hashes, dataset configuration
+  identity, Git commit, and software versions.</li>
+<li><code>trials.csv</code> / <code>trials.json</code>: candidate parameters, status, scores, seed
+  results, and errors.</li>
+<li><code>selection.json</code>: the objective, winning candidate, mean/std, and per-seed
+  checkpoint paths.</li>
+<li><code>best_config.yaml</code>: an ordinary experiment recipe for the winning
+  hyperparameters and first declared training seed.</li>
+<li><code>trials/</code>: exported per-seed experiment artifacts and training states.</li>
+<li><code>ray/</code>: Ray's logs, search state, and checkpoints.</li>
+</ul>
+<p>Reproduce the first seed with <code>nlb2 run -c STUDY_DIR/best_config.yaml</code>.
+When multiple seeds are used, the mean score describes several fitted models;
+<code>best_checkpoints</code> therefore maps each seed to its model. There is no single
+checkpoint with the aggregate score. Exported configs record each seed and
+can be loaded by the usual experiment API.</p>
+<p>Resume an interrupted study with its saved recipe:</p>
+<pre><code class="language-bash">nlb2 tune --resume-from studies/my_study
+</code></pre>
+<p>Ray restores its search state and errored/unfinished trials from their latest
+reported checkpoints. Completed seed runs are retained. Each seed checkpoint
+contains model, optimizer/scheduler, epoch, history, selection, and Python,
+NumPy, and PyTorch RNG state. Restoration checks that the study, data, source,
+and recorded software versions match. Changing the search or adding candidates
+creates a new study. A wall-clock-stopped trial that Ray has already marked
+terminated is not extended by restoration.</p>
+<p>For long experiments, configure periodic evaluation so recovery checkpoints
+exist before the final epoch. Evaluation randomness is isolated from training.
+<code>search_seed</code>, <code>training_seeds</code>, and the base dataset seed have separate roles;
+model-specific initialization generators are also set from each training seed.
+Parallel TPE suggestions can depend on completion order, and numerical
+reproducibility across devices is not guaranteed. Use serial trials for the
+most repeatable adaptive search.</p>
+<p>Local execution works without explicit Ray setup. To use an existing cluster,
+initialize Ray before <code>Study.run()</code>. All workers need the same installed code
+and access to the recorded input paths; the study's local storage path must
+be a shared filesystem on a multi-node cluster. Cloud storage URI support and
+automatic data distribution are not part of this API.</p>
+<h2 id="experiment-reporting">Experiment reporting</h2>
+<p>The underlying experiment API also exposes the new facilities without Ray:</p>
+<pre><code class="language-python">from nlb2 import Experiment
+
+experiment = Experiment.from_config_path(&quot;experiment.yaml&quot;)
+result = experiment.run(callback=lambda report: print(report.epoch, report.metrics))
+</code></pre>
+<p>Callbacks receive <code>ExperimentReport</code> after fresh task evaluations and once
+after final artifacts are written. <code>final</code> distinguishes the last report.
+Returning <code>False</code> from an intermediate callback stops training and retains
+artifacts with status <code>stopped</code>. <code>ExperimentResult.completed_epochs</code> records
+the actual budget, and <code>selected_epoch</code> identifies the exported model.</p>
+<p>Experiment YAML supports a <code>selection</code> block with the same metric, mode,
+and checkpoint fields, and <code>experiment.training_seed</code>, <code>evaluation_seed</code>,
+<code>save_training_state</code>, and <code>save_plots</code>. Ordinary experiments retain final
+model behavior when no selection is requested. With training-state saving
+enabled, <code>Experiment.run(resume_from="training_state.pt")</code> or
+<code>nlb2 run -c experiment.yaml --resume-from training_state.pt</code> continues into
+a new run directory. The training configuration and total budget must match.</p>
+<p>Select using validation only. For expensive studies, search with a small seed
+set, then compare a shortlist at full budget over a larger fixed seed set.
+Evaluate the frozen choice on independent test data afterwards. The API
+rejects declared test splits during tuning; it relies on prepared datasets
+being correctly labeled and partitioned.</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12"><hr>
+<p>
+  <a class="zkunkworks-footer-link" href="/">
+    <span>Built by</span>
+    <img class="zkunkworks-footer-logo" src="../assets/skunk.png" alt="" width="28" height="20">
+    <span>zkunkworks</span>
+  </a>
+</p>
+        </footer>
+        <script src="../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../js/base.js"></script>
+        <script src="../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

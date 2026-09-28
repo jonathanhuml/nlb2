@@ -6,10 +6,10 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         
         
-        <link rel="canonical" href="https://zkunkworks.com/ladys/models/bgpfa/">
+        <link rel="canonical" href="https://zkunkworks.com/nlb2/models/bgpfa/">
         <link rel="shortcut icon" href="../../assets/favicon.ico">
         
-        <title>BGPFA - LaDyS</title>
+        <title>BGPFA - NLB2</title>
         <link href="../../css/bootstrap.min.css" rel="stylesheet">
         <link href="../../css/fontawesome.min.css" rel="stylesheet">
         <link href="../../css/brands.min.css" rel="stylesheet">
@@ -26,7 +26,7 @@
     <body>
         <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
             <div class="container">
-                <a class="navbar-brand" href="../..">LaDyS</a>
+                <a class="navbar-brand" href="../..">NLB2</a>
                 <!-- Expander button -->
                 <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -35,6 +35,9 @@
                 <!-- Expanded navigation -->
                 <div id="navbar-collapse" class="navbar-collapse collapse">
 <ul class="nav navbar-nav">
+  <li class="nav-item">
+    <a href="../../tuning/" class="nav-link">Hyperparameter Tuning</a>
+  </li>
   <li class="nav-item dropdown">
     <a href="#" class="nav-link dropdown-toggle active" aria-current="page" role="button" data-bs-toggle="dropdown" aria-expanded="false">Models</a>
     <ul class="dropdown-menu">
@@ -164,28 +167,31 @@
 <h2 id="source">Source</h2>
 <ul>
 <li>Registry name: <code>bgpfa</code></li>
-<li>Model class: <code>ladys.models.bgpfa.BGPFA</code></li>
-<li>Config class: <code>ladys.models.bgpfa.BGPFAConfig</code></li>
-<li>Source file: <code>src/ladys/models/bgpfa.py</code></li>
+<li>Model class: <code>nlb2.models.bgpfa.BGPFA</code></li>
+<li>Config class: <code>nlb2.models.bgpfa.BGPFAConfig</code></li>
+<li>Source file: <code>src/nlb2/models/bgpfa.py</code></li>
 </ul>
 <h2 id="when-to-use">When to use</h2>
 <p>Use BGPFA when you want the Bayesian GPFA objective from
-<code>tachukao/mgplvm-pytorch</code> inside the LaDyS trainer contract. Unlike the
+<code>tachukao/mgplvm-pytorch</code> inside the NLB2 trainer contract. Unlike the
 classical GPFA EM baseline, this adapter optimizes a Monte Carlo variational
 negative ELBO with standard PyTorch backpropagation.</p>
 <h2 id="assumptions">Assumptions</h2>
 <p>Observations are passed as <code>(batch, time, neurons)</code> tensors and internally
 transposed to mgplvm's <code>(trials, neurons, time)</code> convention. The latent
 posterior has per-trial variational parameters, so the default optimization
-strategy is <code>mgplvm_full_batch_gradient</code>. One LaDyS epoch can run multiple
+strategy is <code>mgplvm_full_batch_gradient</code>. One NLB2 epoch can run multiple
 mgplvm optimizer updates via <code>optimization.steps_per_epoch</code>; this is useful
 when matching reference bGPFA scripts that report fixed optimizer-step
 budgets.</p>
 <h2 id="outputs">Outputs</h2>
 <p><code>forward</code> returns predictive rates/reconstructions, variational latent
 means, and ELBO terms in <code>extras</code>. The core mgplvm implementation is
-vendored in <code>src/mgplvm</code>; this class only adapts it to the LaDyS model,
-loss, and trainer contracts.</p>
+vendored in <code>src/mgplvm</code>; this class only adapts it to the NLB2 model,
+loss, and trainer contracts. Evaluation infers a new posterior from each
+input batch with the learned observation model and GP prior held fixed.
+The <code>nlb_latent_infer_*</code> options control this inference for both NLB and
+synthetic evaluation. Predictions are expected counts per input bin.</p>
 <h2 id="configuration">Configuration</h2>
 <p>Config for variational Bayesian GPFA.</p>
 <table>
@@ -266,6 +272,56 @@ loss, and trainer contracts.</p>
 <td><code>dtype</code></td>
 <td><code>Literal['float64', 'float32']</code></td>
 <td><code>'float64'</code></td>
+</tr>
+<tr>
+<td><code>latent_init</code></td>
+<td><code>Literal['gp_prior', 'fa']</code></td>
+<td><code>'gp_prior'</code></td>
+</tr>
+<tr>
+<td><code>observation_init</code></td>
+<td><code>Literal['mgplvm', 'fa']</code></td>
+<td><code>'mgplvm'</code></td>
+</tr>
+<tr>
+<td><code>nlb_feature_source</code></td>
+<td><code>Literal['latents', 'rates', 'reconstruction']</code></td>
+<td><code>'latents'</code></td>
+</tr>
+<tr>
+<td><code>nlb_decoder</code></td>
+<td><code>Literal['ridge', 'poisson']</code></td>
+<td><code>'poisson'</code></td>
+</tr>
+<tr>
+<td><code>nlb_ridge_alpha</code></td>
+<td><code>float</code></td>
+<td><code>0.01</code></td>
+</tr>
+<tr>
+<td><code>nlb_poisson_max_iter</code></td>
+<td><code>int</code></td>
+<td><code>80</code></td>
+</tr>
+<tr>
+<td><code>nlb_latent_infer_steps</code></td>
+<td><code>int</code></td>
+<td><code>300</code></td>
+</tr>
+<tr>
+<td><code>nlb_latent_infer_n_mc</code></td>
+<td><code>int</code></td>
+<td><code>20</code></td>
+</tr>
+<tr>
+<td><code>nlb_latent_infer_lr</code></td>
+<td><code>float</code></td>
+<td><code>0.1</code></td>
+</tr>
+<tr>
+<td><code>nlb_latent_infer_burnin</code></td>
+<td><code>int</code></td>
+<td><code>1</code></td>
 </tr>
 <tr>
 <td><code>optimization</code></td>

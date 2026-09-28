@@ -9,14 +9,14 @@ import pytest
 import torch
 import yaml
 
-from ladys import Experiment, SelectionConfig, Study, StudyConfig, load_experiment_config
-from ladys.config import experiment_config_from_dict
-from ladys.experiment import experiment_config_to_dict
-from ladys.metrics import EvaluationResult
-from ladys.models.base import BaseDynamicsModel
-from ladys.tuning import SearchParameter, load_study_config
-from ladys.tuning.study import write_results
-from ladys.types import LossOutput, ModelOutput
+from nlb2 import Experiment, SelectionConfig, Study, StudyConfig, load_experiment_config
+from nlb2.config import experiment_config_from_dict
+from nlb2.experiment import experiment_config_to_dict
+from nlb2.metrics import EvaluationResult
+from nlb2.models.base import BaseDynamicsModel
+from nlb2.tuning import SearchParameter, load_study_config
+from nlb2.tuning.study import write_results
+from nlb2.types import LossOutput, ModelOutput
 
 
 def base_config(tmp_path):
@@ -124,7 +124,7 @@ def test_relative_base_and_coupled_parameter_sets(tmp_path):
 
 
 def test_best_selection_matches_checkpoint_predictions_and_epoch(tmp_path, monkeypatch, toy):
-    import ladys.experiment as module
+    import nlb2.experiment as module
     config = base_config(tmp_path)
     config.selection = SelectionConfig(metric="rate_mse", mode="min", checkpoint="best")
     scores = iter([3.0, 1.0, 4.0])
@@ -148,7 +148,7 @@ def test_best_selection_matches_checkpoint_predictions_and_epoch(tmp_path, monke
 
 @pytest.mark.parametrize("strategy", ["gradient", "full_batch_gradient"])
 def test_resume_preserves_optimizer_and_rng_trajectory(tmp_path, toy, strategy):
-    from ladys.models.base import OptimizationConfig
+    from nlb2.models.base import OptimizationConfig
     reference_config = base_config(tmp_path / "reference")
     reference_config.model.optimization = OptimizationConfig(name=strategy, lr=0.01)
     reference = Experiment(reference_config).run()
@@ -176,7 +176,7 @@ def test_resume_preserves_optimizer_and_rng_trajectory(tmp_path, toy, strategy):
 
 
 def test_bgpfa_resume_restores_lazy_optimizer_and_annealing(tmp_path):
-    from ladys.models import BGPFAConfig
+    from nlb2.models import BGPFAConfig
 
     config = base_config(tmp_path)
     config.model = BGPFAConfig(latent_dim=2, ell0=2.0, n_mc_train=1, n_mc_eval=1,
@@ -230,4 +230,4 @@ def test_no_candidate_can_win_from_partial_or_failed_scores(tmp_path):
 
 
 def test_public_api_import_does_not_load_ray():
-    subprocess.run([sys.executable, "-c", "import sys, ladys; assert 'ray' not in sys.modules"], check=True)
+    subprocess.run([sys.executable, "-c", "import sys, nlb2; assert 'ray' not in sys.modules"], check=True)

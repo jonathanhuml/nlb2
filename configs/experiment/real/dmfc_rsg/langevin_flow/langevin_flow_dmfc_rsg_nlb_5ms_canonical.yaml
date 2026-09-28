@@ -9,7 +9,7 @@ model:
   name: langevin_flow
   objective: langevin_flow_elbo
   hidden_size: 280
-  initialization: ladys
+  initialization: nlb2
   output_mode: auto
   fwd_steps: 0
   dropout: 0.05

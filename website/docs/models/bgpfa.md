@@ -7,14 +7,14 @@ Variational Bayesian GPFA with ARD and differentiable ELBO training.
 ## Source
 
 - Registry name: `bgpfa`
-- Model class: `ladys.models.bgpfa.BGPFA`
-- Config class: `ladys.models.bgpfa.BGPFAConfig`
-- Source file: `src/ladys/models/bgpfa.py`
+- Model class: `nlb2.models.bgpfa.BGPFA`
+- Config class: `nlb2.models.bgpfa.BGPFAConfig`
+- Source file: `src/nlb2/models/bgpfa.py`
 
 ## When to use
 
 Use BGPFA when you want the Bayesian GPFA objective from
-`tachukao/mgplvm-pytorch` inside the LaDyS trainer contract. Unlike the
+`tachukao/mgplvm-pytorch` inside the NLB2 trainer contract. Unlike the
 classical GPFA EM baseline, this adapter optimizes a Monte Carlo variational
 negative ELBO with standard PyTorch backpropagation.
 
@@ -23,7 +23,7 @@ negative ELBO with standard PyTorch backpropagation.
 Observations are passed as `(batch, time, neurons)` tensors and internally
 transposed to mgplvm's `(trials, neurons, time)` convention. The latent
 posterior has per-trial variational parameters, so the default optimization
-strategy is `mgplvm_full_batch_gradient`. One LaDyS epoch can run multiple
+strategy is `mgplvm_full_batch_gradient`. One NLB2 epoch can run multiple
 mgplvm optimizer updates via `optimization.steps_per_epoch`; this is useful
 when matching reference bGPFA scripts that report fixed optimizer-step
 budgets.
@@ -32,7 +32,7 @@ budgets.
 
 `forward` returns predictive rates/reconstructions, variational latent
 means, and ELBO terms in `extras`. The core mgplvm implementation is
-vendored in `src/mgplvm`; this class only adapts it to the LaDyS model,
+vendored in `src/mgplvm`; this class only adapts it to the NLB2 model,
 loss, and trainer contracts. Evaluation infers a new posterior from each
 input batch with the learned observation model and GP prior held fixed.
 The `nlb_latent_infer_*` options control this inference for both NLB and

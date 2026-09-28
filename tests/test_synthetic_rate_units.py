@@ -3,20 +3,20 @@ import pytest
 import torch
 from torch.utils.data import DataLoader
 
-from ladys.datasets import ChaoticRNNDataset, ChaoticRNNDatasetConfig, LorenzDataset, LorenzDatasetConfig
-from ladys.datasets.ctd import CTDArrays, CTDDataset, CTDDatasetConfig
-from ladys.metrics import (
+from nlb2.datasets import ChaoticRNNDataset, ChaoticRNNDatasetConfig, LorenzDataset, LorenzDatasetConfig
+from nlb2.datasets.ctd import CTDArrays, CTDDataset, CTDDatasetConfig
+from nlb2.metrics import (
     NLBCoSmoothingAdapter,
     SyntheticEvaluationAdapter,
     bits_per_spike,
     evaluate_model,
     poisson_negative_log_likelihood,
 )
-from ladys.models import LFADSConfig, LangevinFlowConfig
-from ladys.models.base import BaseDynamicsModel
-from ladys.models.baselines import PSTHConfig
-from ladys.preprocessing import smooth_firing_rate
-from ladys.types import ModelOutput
+from nlb2.models import LFADSConfig, LangevinFlowConfig
+from nlb2.models.base import BaseDynamicsModel
+from nlb2.models.baselines import PSTHConfig
+from nlb2.preprocessing import smooth_firing_rate
+from nlb2.types import ModelOutput
 
 
 class FixedRateModel(BaseDynamicsModel):

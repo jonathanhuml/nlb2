@@ -4,7 +4,7 @@ The local MATLAB reference is `/Users/jonathanhuml/Desktop/gpfa-matlab`.
 The Python Elephant reference is:
 `https://github.com/NeuralEnsemble/elephant/tree/master/elephant/gpfa`.
 
-The implementation in `ladys.models.gpfa` is being moved toward the Elephant
+The implementation in `nlb2.models.gpfa` is being moved toward the Elephant
 Python structure while keeping tensors in PyTorch:
 
 - `gpfaEngine.m`: initialize `gamma`, `eps`, `C`, `d`, and diagonal `R`.
@@ -16,13 +16,13 @@ Python structure while keeping tensors in PyTorch:
 
 Current Elephant-aligned choices:
 
-- Elephant uses `sklearn.decomposition.FactorAnalysis`; LaDyS ports the same
+- Elephant uses `sklearn.decomposition.FactorAnalysis`; NLB2 ports the same
   FA EM objective in torch to avoid adding sklearn to the model dependency
   surface.
-- Elephant uses SciPy `L-BFGS-B` for `grad_betgam`; LaDyS uses PyTorch
+- Elephant uses SciPy `L-BFGS-B` for `grad_betgam`; NLB2 uses PyTorch
   autograd with `torch.optim.LBFGS` on the equivalent objective.
 - Elephant exposes both raw latent trajectories and `latent_variable_orth`.
-  LaDyS now returns raw latents in `ModelOutput.latents` and
+  NLB2 now returns raw latents in `ModelOutput.latents` and
   orthonormalized latents plus `Corth` in `ModelOutput.extras`.
 
 Orthonormalization is postprocessing for latent visualization. It should not

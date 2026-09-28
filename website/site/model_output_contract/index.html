@@ -6,10 +6,10 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         
         
-        <link rel="canonical" href="https://zkunkworks.com/ladys/model_output_contract/">
+        <link rel="canonical" href="https://zkunkworks.com/nlb2/model_output_contract/">
         <link rel="shortcut icon" href="../assets/favicon.ico">
         
-        <title>Model Output - LaDyS</title>
+        <title>Model Output - NLB2</title>
         <link href="../css/bootstrap.min.css" rel="stylesheet">
         <link href="../css/fontawesome.min.css" rel="stylesheet">
         <link href="../css/brands.min.css" rel="stylesheet">
@@ -26,7 +26,7 @@
     <body>
         <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
             <div class="container">
-                <a class="navbar-brand" href="..">LaDyS</a>
+                <a class="navbar-brand" href="..">NLB2</a>
                 <!-- Expander button -->
                 <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -35,6 +35,9 @@
                 <!-- Expanded navigation -->
                 <div id="navbar-collapse" class="navbar-collapse collapse">
 <ul class="nav navbar-nav">
+  <li class="nav-item">
+    <a href="../tuning/" class="nav-link">Hyperparameter Tuning</a>
+  </li>
   <li class="nav-item dropdown">
     <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">Models</a>
     <ul class="dropdown-menu">
@@ -146,8 +149,11 @@ field during the training path, so benchmark metrics should use
 <code>model.predict_rates(x)</code> when they specifically need firing-rate curves. The
 stable output fields are:</p>
 <ul>
-<li><code>rates</code>: predicted firing-rate curves in <code>(batch, time, neurons)</code> format.
-  This is the primary Lorenz benchmark output.</li>
+<li><code>rates</code>: predictions in <code>(batch, time, neurons)</code> format.</li>
+<li><code>rates_unit</code>: <code>"counts"</code> (expected spikes per input bin, the default) or
+  <code>"hz"</code> (spikes per second). Poisson scoring consumes expected counts.</li>
+<li><code>full_rates_unit</code>: required when <code>extras["full_rates"]</code> is present; that
+  tensor may use different units from the primary held-out predictions.</li>
 <li><code>latents</code>: inferred latent trajectories in <code>(batch, time, latent_dim)</code> format
   when the method exposes them.</li>
 <li><code>reconstruction</code>: model reconstruction in observation space. For count models
@@ -157,8 +163,13 @@ stable output fields are:</p>
 <li><code>extras</code>: method-specific diagnostics such as posterior variances, ELBO terms,
   marginal log likelihoods, or internal states.</li>
 </ul>
-<p>For the Lorenz task, the default accuracy metric should compare
-<code>model.predict_rates(x)</code> against the generated ground-truth rates. By default
+<p>Exporters use <code>output.count_rates(dt, full=True)</code>. A 20 Hz rate at 5 ms becomes
+0.1 expected spikes; a prediction already equal to 0.1 counts stays 0.1.
+Never multiply every model output by <code>dt</code> unconditionally. LFADS declares Hz;
+NDT, STNDT, LangevinFlow, and MINT declare counts. iLQR-VAE's primary output is
+counts while its full-neuron diagnostic output is Hz.</p>
+<p>Synthetic evaluation normalizes predictions and declared dataset rate targets
+to Hz for MSE/R2, and uses counts separately for Poisson metrics. By default
 <code>predict_rates()</code> uses <code>ModelOutput.rates</code> and then <code>reconstruction</code>; methods
 such as CASSM can override it to call their native prediction path.</p>
 <p>Future benchmark tasks may add metrics that use <code>latents</code> for recovery of the

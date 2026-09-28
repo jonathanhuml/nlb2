@@ -125,13 +125,13 @@ h1 {
   font-size: 2.6rem;
 }
 
-body.homepage [role="main"] > h1#ladys {
+body.homepage [role="main"] > h1#nlb2 {
   display: flex;
   align-items: center;
   gap: 14px;
 }
 
-body.homepage [role="main"] > h1#ladys::before {
+body.homepage [role="main"] > h1#nlb2::before {
   content: "";
   display: inline-block;
   width: 72px;

@@ -7,9 +7,9 @@ Spatiotemporal Neural Data Transformer for binned spike counts.
 ## Source
 
 - Registry name: `stndt`
-- Model class: `ladys.models.stndt.STNDT`
-- Config class: `ladys.models.stndt.STNDTConfig`
-- Source file: `src/ladys/models/stndt.py`
+- Model class: `nlb2.models.stndt.STNDT`
+- Config class: `nlb2.models.stndt.STNDTConfig`
+- Source file: `src/nlb2/models/stndt.py`
 
 ## When to use
 

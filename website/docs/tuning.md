@@ -2,14 +2,14 @@
 
 `Experiment` executes one concrete configuration. `Study` uses Ray Tune to
 choose configurations, run them as ordinary experiments, and select by a
-declared validation metric. Ray is optional. In an existing LaDyS environment:
+declared validation metric. Ray is optional. In an existing NLB2 environment:
 
 ```bash
 pip install "ray[tune]>=2.43,<3" "optuna>=3,<5"
-ladys tune -c configs/tuning/smoothing_lorenz.yaml
+nlb2 tune -c configs/tuning/smoothing_lorenz.yaml
 ```
 
-These dependencies are also declared in LaDyS's `tuning` installation extra.
+These dependencies are also declared in NLB2's `tuning` installation extra.
 
 The smoothing recipe is a small CPU workflow example. It samples four
 bandwidths, including the existing setting, and selects the lowest validation
@@ -20,7 +20,7 @@ three training seeds, so it is a substantial training job.
 ## Python API
 
 ```python
-from ladys import Study
+from nlb2 import Study
 
 study = Study.from_config_path("configs/tuning/smoothing_lorenz.yaml")
 result = study.run()
@@ -70,7 +70,7 @@ name: stndt_mc_maze
 
 `base` can instead contain an inline experiment mapping. A referenced base
 file resolves relative to the study recipe. Data and model input paths resolve
-relative to the working directory at launch, matching `ladys run`; the study
+relative to the working directory at launch, matching `nlb2 run`; the study
 records absolute paths before Ray workers change directories.
 
 Supported distributions are `choice` with a `choices` list, `uniform`,
@@ -148,7 +148,7 @@ A study directory contains:
 - `trials/`: exported per-seed experiment artifacts and training states.
 - `ray/`: Ray's logs, search state, and checkpoints.
 
-Reproduce the first seed with `ladys run -c STUDY_DIR/best_config.yaml`.
+Reproduce the first seed with `nlb2 run -c STUDY_DIR/best_config.yaml`.
 When multiple seeds are used, the mean score describes several fitted models;
 `best_checkpoints` therefore maps each seed to its model. There is no single
 checkpoint with the aggregate score. Exported configs record each seed and
@@ -157,7 +157,7 @@ can be loaded by the usual experiment API.
 Resume an interrupted study with its saved recipe:
 
 ```bash
-ladys tune --resume-from studies/my_study
+nlb2 tune --resume-from studies/my_study
 ```
 
 Ray restores its search state and errored/unfinished trials from their latest
@@ -187,7 +187,7 @@ automatic data distribution are not part of this API.
 The underlying experiment API also exposes the new facilities without Ray:
 
 ```python
-from ladys import Experiment
+from nlb2 import Experiment
 
 experiment = Experiment.from_config_path("experiment.yaml")
 result = experiment.run(callback=lambda report: print(report.epoch, report.metrics))
@@ -204,7 +204,7 @@ and checkpoint fields, and `experiment.training_seed`, `evaluation_seed`,
 `save_training_state`, and `save_plots`. Ordinary experiments retain final
 model behavior when no selection is requested. With training-state saving
 enabled, `Experiment.run(resume_from="training_state.pt")` or
-`ladys run -c experiment.yaml --resume-from training_state.pt` continues into
+`nlb2 run -c experiment.yaml --resume-from training_state.pt` continues into
 a new run directory. The training configuration and total budget must match.
 
 Select using validation only. For expensive studies, search with a small seed

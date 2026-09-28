@@ -7,9 +7,9 @@ Gaussian-smoothed spike-count baseline.
 ## Source
 
 - Registry name: `smoothing`
-- Model class: `ladys.models.baselines.Smoothing`
-- Config class: `ladys.models.baselines.SmoothingConfig`
-- Source file: `src/ladys/models/baselines.py`
+- Model class: `nlb2.models.baselines.Smoothing`
+- Config class: `nlb2.models.baselines.SmoothingConfig`
+- Source file: `src/nlb2/models/baselines.py`
 
 ## When to use
 

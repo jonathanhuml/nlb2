@@ -7,9 +7,9 @@ Optimization-based iLQR-VAE with posterior-control inference and ELBO training.
 ## Source
 
 - Registry name: `ilqr_vae`
-- Model class: `ladys.models.ilqr_vae.ILQRVAE`
-- Config class: `ladys.models.ilqr_vae.ILQRVAEConfig`
-- Source file: `src/ladys/models/ilqr_vae.py`
+- Model class: `nlb2.models.ilqr_vae.ILQRVAE`
+- Config class: `nlb2.models.ilqr_vae.ILQRVAEConfig`
+- Source file: `src/nlb2/models/ilqr_vae.py`
 
 ## Method
 
@@ -20,7 +20,7 @@ of latent inputs `u`. Those inputs drive a recurrent dynamical system to
 produce latent states `z`, and a likelihood readout decodes observations
 from `z`.
 
-The LaDyS implementation ports the tutorial Student input prior,
+The NLB2 implementation ports the tutorial Student input prior,
 Mini-GRU-IO dynamics, Poisson spike likelihood, and iLQR posterior-control
 solver into PyTorch. The posterior covariance is shared across trials as a
 Kronecker product of learned time and input-space factors, matching the
@@ -41,7 +41,7 @@ For NLB-style co-smoothing, the inner solve can be restricted to held-in
 neurons by setting `held_in_neurons`, and the returned rates can be sliced to
 held-out neurons with `output_neuron_start` and `output_neurons`. Returned
 rates are expected spike counts per bin, not Hz, so they can be consumed
-directly by LaDyS/NLB bits-per-spike metrics.
+directly by NLB2/NLB bits-per-spike metrics.
 
 ## ELBO training mode
 
@@ -72,7 +72,7 @@ original repository's standalone Lorenz example uses MGU2 dynamics with a
 3D Gaussian observation model; exact parity with that example would require
 adding that dynamics/likelihood variant as a separate model option. The
 provided `configs/experiment/synthetic/lorenz/ilqr_vae/ilqr_vae_lorenz_100.yaml`
-trains the Poisson/Mini-GRU-IO variant on the LaDyS Lorenz-100 spike
+trains the Poisson/Mini-GRU-IO variant on the NLB2 Lorenz-100 spike
 population for comparison with LFADS and NDT.
 
 ## Configuration
@@ -85,7 +85,7 @@ an explicit `params_path`, `objective="posterior_control"`, and
 `optimization.name="inference_only"`.
 
 `latent_dim` is the recurrent latent state dimension and `input_dim` is the
-dimensionality of the inferred control input. The current trainable LaDyS
+dimensionality of the inferred control input. The current trainable NLB2
 path uses the translated Student prior, Mini-GRU-IO dynamics, Poisson
 likelihood, and shared Kronecker posterior covariance. For co-smoothing
 datasets, `held_in_neurons` selects the neurons used by the inner posterior

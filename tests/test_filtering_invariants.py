@@ -4,8 +4,8 @@ import pytest
 import torch
 from torch.distributions import MultivariateNormal, kl_divergence
 
-from ladys.models import CASSMConfig, KalmanConfig
-from ladys.models._filtering_core import (
+from nlb2.models import CASSMConfig, KalmanConfig
+from nlb2.models._filtering_core import (
     CASSMElboLoss,
     ComputationAwareFilterSmoother,
     _matern32_time_process_cov,

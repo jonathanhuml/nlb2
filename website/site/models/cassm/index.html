@@ -6,10 +6,10 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         
         
-        <link rel="canonical" href="https://zkunkworks.com/ladys/models/cassm/">
+        <link rel="canonical" href="https://zkunkworks.com/nlb2/models/cassm/">
         <link rel="shortcut icon" href="../../assets/favicon.ico">
         
-        <title>CASSM - LaDyS</title>
+        <title>CASSM - NLB2</title>
         <link href="../../css/bootstrap.min.css" rel="stylesheet">
         <link href="../../css/fontawesome.min.css" rel="stylesheet">
         <link href="../../css/brands.min.css" rel="stylesheet">
@@ -26,7 +26,7 @@
     <body>
         <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
             <div class="container">
-                <a class="navbar-brand" href="../..">LaDyS</a>
+                <a class="navbar-brand" href="../..">NLB2</a>
                 <!-- Expander button -->
                 <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -35,6 +35,9 @@
                 <!-- Expanded navigation -->
                 <div id="navbar-collapse" class="navbar-collapse collapse">
 <ul class="nav navbar-nav">
+  <li class="nav-item">
+    <a href="../../tuning/" class="nav-link">Hyperparameter Tuning</a>
+  </li>
   <li class="nav-item dropdown">
     <a href="#" class="nav-link dropdown-toggle active" aria-current="page" role="button" data-bs-toggle="dropdown" aria-expanded="false">Models</a>
     <ul class="dropdown-menu">
@@ -164,14 +167,14 @@
 <h2 id="source">Source</h2>
 <ul>
 <li>Registry name: <code>cassm</code></li>
-<li>Model class: <code>ladys.models.cassm.CASSM</code></li>
-<li>Config class: <code>ladys.models.cassm.CASSMConfig</code></li>
-<li>Source file: <code>src/ladys/models/cassm.py</code></li>
+<li>Model class: <code>nlb2.models.cassm.CASSM</code></li>
+<li>Config class: <code>nlb2.models.cassm.CASSMConfig</code></li>
+<li>Source file: <code>src/nlb2/models/cassm.py</code></li>
 </ul>
 <h2 id="when-to-use">When to use</h2>
 <p>Use CASSM when benchmarking computation-aware sparse state-space models
-against latent dynamics baselines. LaDyS keeps the compact filtering core
-inside <code>ladys.models</code> and maps it onto the shared model, loss, prediction,
+against latent dynamics baselines. NLB2 keeps the compact filtering core
+inside <code>nlb2.models</code> and maps it onto the shared model, loss, prediction,
 and device contracts.</p>
 <h2 id="inputs">Inputs</h2>
 <p><code>forward</code> expects observations shaped <code>(batch, time, neurons)</code>.</p>
@@ -229,6 +232,21 @@ rate predictions shaped like the input observations.</p>
 <td><code>health_checks</code></td>
 <td><code>bool</code></td>
 <td><code>True</code></td>
+</tr>
+<tr>
+<td><code>nlb_feature_source</code></td>
+<td><code>Literal['latents', 'rates', 'predict_rates']</code></td>
+<td><code>'latents'</code></td>
+</tr>
+<tr>
+<td><code>nlb_decoder</code></td>
+<td><code>Literal['ridge', 'poisson']</code></td>
+<td><code>'ridge'</code></td>
+</tr>
+<tr>
+<td><code>nlb_ridge_alpha</code></td>
+<td><code>float</code></td>
+<td><code>500.0</code></td>
 </tr>
 <tr>
 <td><code>optimization</code></td>

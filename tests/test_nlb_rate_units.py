@@ -2,11 +2,11 @@ import numpy as np
 import pytest
 import torch
 
-from ladys.models import LFADSConfig, LangevinFlowConfig, NDTConfig, STNDTConfig
-from ladys.models.base import EnsembleDynamicsModel
-from ladys.models.ilqr_vae import ILQRVAEConfig
-from ladys.nlb_eval import _collect_full_rate_parts, nlb_bits_per_spike
-from ladys.types import ModelOutput
+from nlb2.models import LFADSConfig, LangevinFlowConfig, NDTConfig, STNDTConfig
+from nlb2.models.base import EnsembleDynamicsModel
+from nlb2.models.ilqr_vae import ILQRVAEConfig
+from nlb2.nlb_eval import _collect_full_rate_parts, nlb_bits_per_spike
+from nlb2.types import ModelOutput
 
 
 def _model(name):

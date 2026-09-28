@@ -7,15 +7,15 @@ Latent Factor Analysis via Dynamical Systems for binned spike counts.
 ## Source
 
 - Registry name: `lfads`
-- Model class: `ladys.models.lfads.LFADS`
-- Config class: `ladys.models.lfads.LFADSConfig`
-- Source file: `src/ladys/models/lfads.py`
+- Model class: `nlb2.models.lfads.LFADS`
+- Config class: `nlb2.models.lfads.LFADSConfig`
+- Source file: `src/nlb2/models/lfads.py`
 
 ## When to use
 
 Use LFADS as a nonlinear variational sequence model for neural population
 spike counts. This implementation adapts the LFADS demo architecture into
-the LaDyS model contract: bidirectional encoders infer a generator initial
+the NLB2 model contract: bidirectional encoders infer a generator initial
 condition and controller context, a generator GRU produces latent factors,
 and an exponential readout returns Poisson firing rates.
 

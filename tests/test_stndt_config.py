@@ -2,8 +2,8 @@ from pathlib import Path
 
 import torch
 
-from ladys.config import load_experiment_config
-from ladys.models.stndt import STNDTConfig
+from nlb2.config import load_experiment_config
+from nlb2.models.stndt import STNDTConfig
 
 
 VALID_STNDT_NLB_CONFIGS = [

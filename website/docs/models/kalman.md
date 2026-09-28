@@ -7,9 +7,9 @@ Dense Kalman filter baseline adapted from the CASSM source.
 ## Source
 
 - Registry name: `kalman`
-- Model class: `ladys.models.kalman.Kalman`
-- Config class: `ladys.models.kalman.KalmanConfig`
-- Source file: `src/ladys/models/kalman.py`
+- Model class: `nlb2.models.kalman.Kalman`
+- Config class: `nlb2.models.kalman.KalmanConfig`
+- Source file: `src/nlb2/models/kalman.py`
 
 ## When to use
 

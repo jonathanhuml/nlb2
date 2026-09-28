@@ -7,9 +7,9 @@ Peri-stimulus time histogram baseline.
 ## Source
 
 - Registry name: `psth`
-- Model class: `ladys.models.baselines.PSTH`
-- Config class: `ladys.models.baselines.PSTHConfig`
-- Source file: `src/ladys/models/baselines.py`
+- Model class: `nlb2.models.baselines.PSTH`
+- Config class: `nlb2.models.baselines.PSTHConfig`
+- Source file: `src/nlb2/models/baselines.py`
 
 ## When to use
 

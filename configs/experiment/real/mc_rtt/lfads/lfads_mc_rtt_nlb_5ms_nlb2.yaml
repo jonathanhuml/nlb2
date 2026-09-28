@@ -1,0 +1,71 @@
+dataset:
+  name: mc_rtt
+  split: val
+  bin_size_ms: 5
+  max_trials: null
+  input_mode: heldin_full_reconstruction
+  include_forward: true
+  seed: 100
+
+model:
+  name: lfads
+  objective: lfads_elbo
+  generator_dim: 100
+  initial_condition_dim: 100
+  inferred_input_dim: 4
+  factor_dim: 40
+  g0_encoder_dim: 100
+  controller_encoder_dim: 80
+  controller_dim: 80
+  g0_prior_kappa: 0.1
+  inferred_input_prior_kappa: 0.1
+  inferred_input_prior: autoregressive
+  inferred_input_prior_tau: 10.0
+  keep_prob: 0.98
+  clip_val: 5.0
+  dt: 0.005
+  log_rate_min: -8.0
+  log_rate_max: 8.0
+  posterior_logvar_min: -9.210340371976182
+  posterior_logvar_max: 5.0
+  reconstruction_time_steps: 160
+  controller_lag: 1
+  readout_neurons: 130
+  output_neuron_start: 98
+  output_neurons: 32
+  use_log1p_encoder_inputs: false
+  initialize_log_rate_bias: true
+  prediction_samples: 1
+  loss_scale: 10000.0
+  reconstruction_reduce_mean: true
+  coordinated_dropout_rate: 0.3
+  coordinated_dropout_pass_rate: 0.0
+  coordinated_dropout_ic_enc_seq_len: 0
+  kl_weight_schedule_start: 0
+  kl_weight_schedule_dur: 1360
+  kl_g0_scale: 0.0
+  kl_u_scale: 0.0
+  l2_weight_schedule_start: 0
+  l2_weight_schedule_dur: 1360
+  l2_gen_scale: 0.0
+  l2_con_scale: 0.0
+  optimization:
+    name: gradient
+    optimizer: AdamW
+    lr: 1.0e-2
+    weight_decay: 0.0
+    gradient_clip: 200.0
+
+preprocessing:
+  observations: null
+
+trainer:
+  epochs: 100
+  batch_size: 64
+  device: cuda
+  live_eval_interval: 10
+
+experiment:
+  output_dir: runs
+  run_name: lfads_mc_rtt_nlb_5ms_nlb2
+  save_predictions: true

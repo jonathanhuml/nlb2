@@ -7,14 +7,14 @@ Gaussian Process Factor Analysis with diagonal observation noise.
 ## Source
 
 - Registry name: `gpfa`
-- Model class: `ladys.models.gpfa.GPFA`
-- Config class: `ladys.models.gpfa.GPFAConfig`
-- Source file: `src/ladys/models/gpfa.py`
+- Model class: `nlb2.models.gpfa.GPFA`
+- Config class: `nlb2.models.gpfa.GPFAConfig`
+- Source file: `src/nlb2/models/gpfa.py`
 
 ## When to use
 
 Use GPFA as a classical latent-variable baseline for neural population
-activity with smooth low-dimensional trajectories. The default LaDyS
+activity with smooth low-dimensional trajectories. The default NLB2
 adapter optimizes the exact marginal negative log likelihood with standard
 PyTorch backpropagation. The original EM-style update remains available by
 setting `optimization.name` to `em`.
@@ -34,12 +34,12 @@ differentiable marginal log likelihood used by the loss.
 ## Synthetic datasets
 
 On synthetic datasets, GPFA is evaluated through the default synthetic
-adapter. The model returns inferred rates and latents, and LaDyS compares
+adapter. The model returns inferred rates and latents, and NLB2 compares
 them against dataset-provided ground-truth rates and latent states when
 those targets are available.
 
 ```bash
-ladys run -c configs/experiment/synthetic/lorenz/gpfa/gpfa_lorenz.yaml
+nlb2 run -c configs/experiment/synthetic/lorenz/gpfa/gpfa_lorenz.yaml
 ```
 
 The resulting run folder contains `metrics.json` with synthetic metrics
@@ -57,9 +57,9 @@ co-smoothing bits/spike metric.
 Prepare the NLB H5 first, then run the real-data config:
 
 ```bash
-ladys prepare-nlb --datasets mc_maze --splits val --bin-sizes-ms 5 --download
-ladys run -c configs/experiment/real/mc_maze/gpfa/gpfa_mc_maze_nlb_5ms.yaml
-ladys score-nlb --run-dir runs/gpfa_mc_maze_nlb_5ms
+nlb2 prepare-nlb --datasets mc_maze --splits val --bin-sizes-ms 5 --download
+nlb2 run -c configs/experiment/real/mc_maze/gpfa/gpfa_mc_maze_nlb_5ms.yaml
+nlb2 score-nlb --run-dir runs/gpfa_mc_maze_nlb_5ms
 ```
 
 This real-data path reports held-out `co_bps` and writes held-out rate

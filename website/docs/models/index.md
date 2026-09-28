@@ -19,7 +19,7 @@ python website/tools/generate_model_docs.py
 | [Kalman](kalman.md) | `kalman` | Dense Kalman filter baseline adapted from the CASSM source. |
 | [LangevinFlow](langevin_flow.md) | `langevin_flow` | LangevinFlow sequential VAE for binned neural spike counts. |
 | [LFADS](lfads.md) | `lfads` | Latent Factor Analysis via Dynamical Systems for binned spike counts. |
-| [MINT](mint.md) | `mint` | Mesh of Idealized Neural Trajectories adapted to the LaDyS API. |
+| [MINT](mint.md) | `mint` | Mesh of Idealized Neural Trajectories adapted to the NLB2 API. |
 | [NDT](ndt.md) | `ndt` | Transformer encoder trained with a masked Poisson spike objective. |
 | [PSTH](psth.md) | `psth` | Peri-stimulus time histogram baseline. |
 | [Smoothing](smoothing.md) | `smoothing` | Gaussian-smoothed spike-count baseline. |

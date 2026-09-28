@@ -5,13 +5,13 @@ import pytest
 import torch
 from torch.distributions import Normal, kl_divergence
 
-from ladys.datasets import (
+from nlb2.datasets import (
     ChaoticRNNDataset, ChaoticRNNDatasetConfig, LorenzDataset, LorenzDatasetConfig,
 )
-from ladys.models import LangevinFlowConfig, NDTConfig
-from ladys.models.langevin_flow import LangevinFlow
-from ladys.datasets.nlb import NLBArrays, NLBDataset, NLBDatasetConfig
-from ladys.preprocessing import PreprocessedDataset, PreprocessingConfig
+from nlb2.models import LangevinFlowConfig, NDTConfig
+from nlb2.models.langevin_flow import LangevinFlow
+from nlb2.datasets.nlb import NLBArrays, NLBDataset, NLBDatasetConfig
+from nlb2.preprocessing import PreprocessedDataset, PreprocessingConfig
 
 
 def small_config(method, **kwargs):

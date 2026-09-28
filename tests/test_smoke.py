@@ -8,7 +8,7 @@ import pytest
 import torch
 from torch.utils.data import DataLoader
 
-from ladys.datasets import (
+from nlb2.datasets import (
     ChaoticRNNDataset,
     ChaoticRNNDatasetConfig,
     CTDDataset,
@@ -18,9 +18,9 @@ from ladys.datasets import (
     NLBDataset,
     NLBDatasetConfig,
 )
-from ladys.metrics import compute_available_metrics
-from ladys.metrics import evaluate_model
-from ladys.models import (
+from nlb2.metrics import compute_available_metrics
+from nlb2.metrics import evaluate_model
+from nlb2.models import (
     BGPFAConfig,
     CASSMConfig,
     EnsembleDynamicsModel,
@@ -33,8 +33,8 @@ from ladys.models import (
     SmoothingConfig,
     STNDTConfig,
 )
-from ladys.types import ModelOutput, StepResult
-from ladys.training.strategies import build_strategy
+from nlb2.types import ModelOutput, StepResult
+from nlb2.training.strategies import build_strategy
 
 
 def _assert_all_trainable_parameters_receive_gradients(model, loss, allowed_missing=()):

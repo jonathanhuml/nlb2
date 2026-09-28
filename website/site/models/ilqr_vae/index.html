@@ -6,10 +6,10 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         
         
-        <link rel="canonical" href="https://zkunkworks.com/ladys/models/ilqr_vae/">
+        <link rel="canonical" href="https://zkunkworks.com/nlb2/models/ilqr_vae/">
         <link rel="shortcut icon" href="../../assets/favicon.ico">
         
-        <title>ILQR-VAE - LaDyS</title>
+        <title>ILQR-VAE - NLB2</title>
         <link href="../../css/bootstrap.min.css" rel="stylesheet">
         <link href="../../css/fontawesome.min.css" rel="stylesheet">
         <link href="../../css/brands.min.css" rel="stylesheet">
@@ -26,7 +26,7 @@
     <body>
         <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
             <div class="container">
-                <a class="navbar-brand" href="../..">LaDyS</a>
+                <a class="navbar-brand" href="../..">NLB2</a>
                 <!-- Expander button -->
                 <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -35,6 +35,9 @@
                 <!-- Expanded navigation -->
                 <div id="navbar-collapse" class="navbar-collapse collapse">
 <ul class="nav navbar-nav">
+  <li class="nav-item">
+    <a href="../../tuning/" class="nav-link">Hyperparameter Tuning</a>
+  </li>
   <li class="nav-item dropdown">
     <a href="#" class="nav-link dropdown-toggle active" aria-current="page" role="button" data-bs-toggle="dropdown" aria-expanded="false">Models</a>
     <ul class="dropdown-menu">
@@ -168,9 +171,9 @@
 <h2 id="source">Source</h2>
 <ul>
 <li>Registry name: <code>ilqr_vae</code></li>
-<li>Model class: <code>ladys.models.ilqr_vae.ILQRVAE</code></li>
-<li>Config class: <code>ladys.models.ilqr_vae.ILQRVAEConfig</code></li>
-<li>Source file: <code>src/ladys/models/ilqr_vae.py</code></li>
+<li>Model class: <code>nlb2.models.ilqr_vae.ILQRVAE</code></li>
+<li>Config class: <code>nlb2.models.ilqr_vae.ILQRVAEConfig</code></li>
+<li>Source file: <code>src/nlb2/models/ilqr_vae.py</code></li>
 </ul>
 <h2 id="method">Method</h2>
 <p>iLQR-VAE is a latent dynamical model with no amortized recognition network
@@ -179,34 +182,39 @@ setting, the model solves an inner optimal-control problem over a sequence
 of latent inputs <code>u</code>. Those inputs drive a recurrent dynamical system to
 produce latent states <code>z</code>, and a likelihood readout decodes observations
 from <code>z</code>.</p>
-<p>The LaDyS implementation ports the tutorial Student input prior,
+<p>The NLB2 implementation ports the tutorial Student input prior,
 Mini-GRU-IO dynamics, Poisson spike likelihood, and iLQR posterior-control
 solver into PyTorch. The posterior covariance is shared across trials as a
 Kronecker product of learned time and input-space factors, matching the
 structure used by the original tutorial code.</p>
 <h2 id="inference-only-checkpoint-mode">Inference-only checkpoint mode</h2>
 <p>With <code>objective="posterior_control"</code> and <code>initialization="pretrained"</code>, the
-model loads <code>final_params.bin</code> and uses iLQR only to infer posterior
-controls for each evaluation trial. This is the mode used to reproduce the
-MC_Maze tutorial result. It can register the checkpoint tensors either as
+model loads the supplied <code>params_path</code> and uses iLQR only to infer posterior
+controls for each evaluation trial. It can register checkpoint tensors as
 buffers (<code>trainable_parameters=false</code>) or as <code>nn.Parameter</code>s
 (<code>trainable_parameters=true</code>) for regression checks; with zero training
-epochs both paths are numerically identical.</p>
+epochs both paths are numerically identical. The corrected solver includes
+the terminal observation likelihood and is not an exact reproduction of
+historical predictions made before that correction.</p>
 <p>For NLB-style co-smoothing, the inner solve can be restricted to held-in
 neurons by setting <code>held_in_neurons</code>, and the returned rates can be sliced to
 held-out neurons with <code>output_neuron_start</code> and <code>output_neurons</code>. Returned
 rates are expected spike counts per bin, not Hz, so they can be consumed
-directly by LaDyS/NLB bits-per-spike metrics.</p>
+directly by NLB2/NLB bits-per-spike metrics.</p>
 <h2 id="elbo-training-mode">ELBO training mode</h2>
 <p>With <code>objective="ilqr_vae_elbo"</code> and a gradient optimizer, training follows
 the original iLQR-VAE outer objective:</p>
 <pre><code class="language-text">ELBO = H[q(u | o)] + E_q[log p(u) + log p(o | z(u))]
 loss = -ELBO / num_observations + regularizer
 </code></pre>
-<p>The inner iLQR solve provides the posterior mean controls and is treated as
-an implicit inference step; the outer PyTorch backward pass differentiates
-the sampled ELBO through the Student prior, dynamics, likelihood readout,
-and shared posterior covariance parameters. Bounded parameters such as prior
+<p>The inner iLQR solve provides the posterior mean controls. By default the
+outer backward pass differentiates through the executed solver updates as
+well as the sampled ELBO, including the Student prior, dynamics, likelihood,
+and shared posterior covariance. This unrolled finite-iteration derivative
+differs from the upstream implicit adjoint at an optimum. Adam fallback
+also preserves its control gradient; a detached-control approximation is
+available only by explicitly setting <code>differentiate_controls=false</code>.
+Bounded parameters such as prior
 scales, degrees of freedom, gains, and covariance diagonals are projected
 back into their valid domains after optimizer steps.</p>
 <h2 id="current-scope">Current scope</h2>
@@ -216,22 +224,23 @@ original repository's standalone Lorenz example uses MGU2 dynamics with a
 3D Gaussian observation model; exact parity with that example would require
 adding that dynamics/likelihood variant as a separate model option. The
 provided <code>configs/experiment/synthetic/lorenz/ilqr_vae/ilqr_vae_lorenz_100.yaml</code>
-trains the Poisson/Mini-GRU-IO variant on the LaDyS Lorenz-100 spike
+trains the Poisson/Mini-GRU-IO variant on the NLB2 Lorenz-100 spike
 population for comparison with LFADS and NDT.</p>
 <h2 id="configuration">Configuration</h2>
 <p>Config for the PyTorch iLQR-VAE adapter.</p>
-<p>Use <code>objective="posterior_control"</code> with <code>initialization="pretrained"</code> and
-<code>optimization.name="inference_only"</code> to reproduce a fixed checkpoint, such
-as the MC_Maze tutorial model. Use <code>objective="ilqr_vae_elbo"</code>,
-<code>initialization="random"</code>, <code>trainable_parameters=true</code>, and a gradient
-optimizer to train a new model from scratch.</p>
+<p>The default ELBO objective trains a randomly initialized model. Loading a
+fixed tutorial checkpoint is opt-in through <code>initialization="pretrained"</code>,
+an explicit <code>params_path</code>, <code>objective="posterior_control"</code>, and
+<code>optimization.name="inference_only"</code>.</p>
 <p><code>latent_dim</code> is the recurrent latent state dimension and <code>input_dim</code> is the
-dimensionality of the inferred control input. The current trainable LaDyS
+dimensionality of the inferred control input. The current trainable NLB2
 path uses the translated Student prior, Mini-GRU-IO dynamics, Poisson
 likelihood, and shared Kronecker posterior covariance. For co-smoothing
 datasets, <code>held_in_neurons</code> selects the neurons used by the inner posterior
 solve, while <code>output_neuron_start</code> and <code>output_neurons</code> select the decoded
-prediction slice returned to the benchmark metrics.</p>
+prediction slice returned to the benchmark metrics. <code>build_from_data</code>
+derives those slices and <code>dt</code> from the dataset; explicit inconsistent
+values are rejected. Direct <code>build</code> uses unit-width bins if <code>dt</code> is omitted.</p>
 <table>
 <thead>
 <tr>
@@ -249,17 +258,37 @@ prediction slice returned to the benchmark metrics.</p>
 <tr>
 <td><code>objective</code></td>
 <td><code>Literal['posterior_control', 'ilqr_vae_elbo']</code></td>
-<td><code>'posterior_control'</code></td>
+<td><code>'ilqr_vae_elbo'</code></td>
 </tr>
 <tr>
 <td><code>params_path</code></td>
 <td><code>Optional[str]</code></td>
-<td><code>'data/real/ilqr_vae/final_params.bin'</code></td>
+<td><code>None</code></td>
 </tr>
 <tr>
 <td><code>initialization</code></td>
-<td><code>Literal['pretrained', 'random']</code></td>
-<td><code>'pretrained'</code></td>
+<td><code>Literal['pretrained', 'random', 'checkpoint_transfer']</code></td>
+<td><code>'random'</code></td>
+</tr>
+<tr>
+<td><code>template_params_path</code></td>
+<td><code>Optional[str]</code></td>
+<td><code>None</code></td>
+</tr>
+<tr>
+<td><code>random_init_profile</code></td>
+<td><code>Literal['default', 'tutorial_mc_maze']</code></td>
+<td><code>'default'</code></td>
+</tr>
+<tr>
+<td><code>readout_bias_initialization</code></td>
+<td><code>Literal['none', 'empirical_rates']</code></td>
+<td><code>'none'</code></td>
+</tr>
+<tr>
+<td><code>empirical_rate_floor_hz</code></td>
+<td><code>float</code></td>
+<td><code>0.001</code></td>
 </tr>
 <tr>
 <td><code>latent_dim</code></td>
@@ -284,7 +313,7 @@ prediction slice returned to the benchmark metrics.</p>
 <tr>
 <td><code>max_iter</code></td>
 <td><code>int</code></td>
-<td><code>100</code></td>
+<td><code>5</code></td>
 </tr>
 <tr>
 <td><code>lr</code></td>
@@ -292,9 +321,34 @@ prediction slice returned to the benchmark metrics.</p>
 <td><code>None</code></td>
 </tr>
 <tr>
+<td><code>control_hessian_mode</code></td>
+<td><code>Literal['true', 'fisher', 'clamped']</code></td>
+<td><code>'true'</code></td>
+</tr>
+<tr>
+<td><code>ilqr_failure_fallback</code></td>
+<td><code>Literal['none', 'adam', 'lbfgs']</code></td>
+<td><code>'adam'</code></td>
+</tr>
+<tr>
+<td><code>ilqr_fallback_max_iter</code></td>
+<td><code>int</code></td>
+<td><code>25</code></td>
+</tr>
+<tr>
+<td><code>ilqr_fallback_lr</code></td>
+<td><code>Optional[float]</code></td>
+<td><code>None</code></td>
+</tr>
+<tr>
+<td><code>differentiate_controls</code></td>
+<td><code>bool</code></td>
+<td><code>True</code></td>
+</tr>
+<tr>
 <td><code>trainable_parameters</code></td>
 <td><code>bool</code></td>
-<td><code>False</code></td>
+<td><code>True</code></td>
 </tr>
 <tr>
 <td><code>n_posterior_samples</code></td>
@@ -333,13 +387,13 @@ prediction slice returned to the benchmark metrics.</p>
 </tr>
 <tr>
 <td><code>dt</code></td>
-<td><code>float</code></td>
-<td><code>0.005</code></td>
+<td><code>Optional[float]</code></td>
+<td><code>None</code></td>
 </tr>
 <tr>
 <td><code>optimization</code></td>
 <td><code>OptimizationConfig</code></td>
-<td><code>OptimizationConfig(name='inference_only')</code></td>
+<td><code>OptimizationConfig(name='gradient', lr=0.001)</code></td>
 </tr>
 </tbody>
 </table>

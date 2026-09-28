@@ -5,9 +5,9 @@ import h5py
 import numpy as np
 import pytest
 
-from ladys.cli import main
-from ladys.datasets import nlb as nlb_module
-from ladys.nlb_eval import nlb_bits_per_spike, score_ladys_predictions
+from nlb2.cli import main
+from nlb2.datasets import nlb as nlb_module
+from nlb2.nlb_eval import nlb_bits_per_spike, score_nlb2_predictions
 
 
 @pytest.mark.parametrize("missing", [
@@ -56,20 +56,20 @@ def test_nlb_bits_per_spike_matches_manual_poisson_ratio():
     assert score == pytest.approx(expected)
 
 
-def test_score_ladys_predictions_npz(tmp_path: Path):
+def test_score_nlb2_predictions_npz(tmp_path: Path):
     path = tmp_path / "predictions.npz"
     spikes = np.array([[[1.0], [0.0]], [[2.0], [1.0]]])
     rates = np.array([[[1.1], [0.2]], [[1.7], [1.2]]])
     np.savez(path, pred_rates=rates, target_spikes=spikes)
 
-    score = score_ladys_predictions(path)
+    score = score_nlb2_predictions(path)
 
     assert score.co_bps == pytest.approx(nlb_bits_per_spike(rates, spikes))
     assert score.prediction_shape == rates.shape
     assert score.target_shape == spikes.shape
 
 
-def test_score_nlb_cli_for_ladys_predictions(tmp_path: Path, capsys):
+def test_score_nlb_cli_for_nlb2_predictions(tmp_path: Path, capsys):
     predictions = tmp_path / "predictions.npz"
     np.savez(
         predictions,
@@ -90,7 +90,7 @@ def test_synthetic_artifact_scoring_prefers_explicit_count_rates(tmp_path):
     spikes = np.array([[[0.0], [1.0]]])
     np.savez(path, pred_rates=counts / 0.005, pred_count_rates=counts,
              target_spikes=spikes)
-    assert score_ladys_predictions(path).co_bps == pytest.approx(
+    assert score_nlb2_predictions(path).co_bps == pytest.approx(
         nlb_bits_per_spike(counts, spikes)
     )
 

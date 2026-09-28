@@ -7,9 +7,9 @@ Transformer encoder trained with a masked Poisson spike objective.
 ## Source
 
 - Registry name: `ndt`
-- Model class: `ladys.models.ndt.NDT`
-- Config class: `ladys.models.ndt.NDTConfig`
-- Source file: `src/ladys/models/ndt.py`
+- Model class: `nlb2.models.ndt.NDT`
+- Config class: `nlb2.models.ndt.NDTConfig`
+- Source file: `src/nlb2/models/ndt.py`
 
 ## When to use
 

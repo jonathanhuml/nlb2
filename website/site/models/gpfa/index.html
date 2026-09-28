@@ -6,10 +6,10 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         
         
-        <link rel="canonical" href="https://zkunkworks.com/ladys/models/gpfa/">
+        <link rel="canonical" href="https://zkunkworks.com/nlb2/models/gpfa/">
         <link rel="shortcut icon" href="../../assets/favicon.ico">
         
-        <title>GPFA - LaDyS</title>
+        <title>GPFA - NLB2</title>
         <link href="../../css/bootstrap.min.css" rel="stylesheet">
         <link href="../../css/fontawesome.min.css" rel="stylesheet">
         <link href="../../css/brands.min.css" rel="stylesheet">
@@ -26,7 +26,7 @@
     <body>
         <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
             <div class="container">
-                <a class="navbar-brand" href="../..">LaDyS</a>
+                <a class="navbar-brand" href="../..">NLB2</a>
                 <!-- Expander button -->
                 <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -35,6 +35,9 @@
                 <!-- Expanded navigation -->
                 <div id="navbar-collapse" class="navbar-collapse collapse">
 <ul class="nav navbar-nav">
+  <li class="nav-item">
+    <a href="../../tuning/" class="nav-link">Hyperparameter Tuning</a>
+  </li>
   <li class="nav-item dropdown">
     <a href="#" class="nav-link dropdown-toggle active" aria-current="page" role="button" data-bs-toggle="dropdown" aria-expanded="false">Models</a>
     <ul class="dropdown-menu">
@@ -176,13 +179,13 @@
 <h2 id="source">Source</h2>
 <ul>
 <li>Registry name: <code>gpfa</code></li>
-<li>Model class: <code>ladys.models.gpfa.GPFA</code></li>
-<li>Config class: <code>ladys.models.gpfa.GPFAConfig</code></li>
-<li>Source file: <code>src/ladys/models/gpfa.py</code></li>
+<li>Model class: <code>nlb2.models.gpfa.GPFA</code></li>
+<li>Config class: <code>nlb2.models.gpfa.GPFAConfig</code></li>
+<li>Source file: <code>src/nlb2/models/gpfa.py</code></li>
 </ul>
 <h2 id="when-to-use">When to use</h2>
 <p>Use GPFA as a classical latent-variable baseline for neural population
-activity with smooth low-dimensional trajectories. The default LaDyS
+activity with smooth low-dimensional trajectories. The default NLB2
 adapter optimizes the exact marginal negative log likelihood with standard
 PyTorch backpropagation. The original EM-style update remains available by
 setting <code>optimization.name</code> to <code>em</code>.</p>
@@ -196,10 +199,10 @@ nonnegative rate estimates, orthonormalized latent diagnostics, and the
 differentiable marginal log likelihood used by the loss.</p>
 <h2 id="synthetic-datasets">Synthetic datasets</h2>
 <p>On synthetic datasets, GPFA is evaluated through the default synthetic
-adapter. The model returns inferred rates and latents, and LaDyS compares
+adapter. The model returns inferred rates and latents, and NLB2 compares
 them against dataset-provided ground-truth rates and latent states when
 those targets are available.</p>
-<pre><code class="language-bash">ladys run -c configs/experiment/synthetic/lorenz/gpfa/gpfa_lorenz.yaml
+<pre><code class="language-bash">nlb2 run -c configs/experiment/synthetic/lorenz/gpfa/gpfa_lorenz.yaml
 </code></pre>
 <p>The resulting run folder contains <code>metrics.json</code> with synthetic metrics
 such as rate reconstruction quality and latent linear R2 when the target
@@ -211,9 +214,9 @@ PyTorch Poisson readout from training-set GPFA latents to training held-out
 neurons, then scores eval held-out expected counts with the NLB
 co-smoothing bits/spike metric.</p>
 <p>Prepare the NLB H5 first, then run the real-data config:</p>
-<pre><code class="language-bash">ladys prepare-nlb --datasets mc_maze --splits test --bin-sizes-ms 5 --download
-ladys run -c configs/experiment/real/mc_maze/gpfa/gpfa_mc_maze_nlb_5ms.yaml
-ladys score-nlb --run-dir runs/gpfa_mc_maze_nlb_5ms
+<pre><code class="language-bash">nlb2 prepare-nlb --datasets mc_maze --splits val --bin-sizes-ms 5 --download
+nlb2 run -c configs/experiment/real/mc_maze/gpfa/gpfa_mc_maze_nlb_5ms.yaml
+nlb2 score-nlb --run-dir runs/gpfa_mc_maze_nlb_5ms
 </code></pre>
 <p>This real-data path reports held-out <code>co_bps</code> and writes held-out rate
 predictions in <code>predictions.npz</code>; it does not require GPFA itself to emit

@@ -5,13 +5,13 @@ import numpy as np
 import pytest
 import torch
 
-from ladys.config import ExperimentConfig
-from ladys.datasets import LorenzDatasetConfig
-from ladys.experiment import Experiment
-from ladys.metrics import evaluate_model
-from ladys.models.baselines import PSTHConfig, SmoothingConfig, _rates_from_nlb_condition_psth
-from ladys.preprocessing import PreprocessingConfig
-from ladys.training import TrainerConfig
+from nlb2.config import ExperimentConfig
+from nlb2.datasets import LorenzDatasetConfig
+from nlb2.experiment import Experiment
+from nlb2.metrics import evaluate_model
+from nlb2.models.baselines import PSTHConfig, SmoothingConfig, _rates_from_nlb_condition_psth
+from nlb2.preprocessing import PreprocessingConfig
+from nlb2.training import TrainerConfig
 
 
 def test_psth_requires_training_and_rejects_empty_training():

@@ -39,7 +39,7 @@ jobs:
           rm -rf public
           mkdir -p public
           cp -R website/home/. public/
-          mkdocs build --config-file website/mkdocs.yml --strict --site-dir "$GITHUB_WORKSPACE/public/ladys"
+          mkdocs build --config-file website/mkdocs.yml --strict --site-dir "$GITHUB_WORKSPACE/public/nlb2"
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5

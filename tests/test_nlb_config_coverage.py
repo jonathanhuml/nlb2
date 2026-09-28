@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from ladys.config import load_experiment_config
+from nlb2.config import load_experiment_config
 
 
 CONFIG_ROOT = Path(__file__).resolve().parents[1] / "configs" / "experiment" / "real"
@@ -21,7 +21,7 @@ def test_core_5ms_validation_recipe_exists_and_can_train(dataset, model):
     paths = sorted((CONFIG_ROOT / dataset / model).glob(f"{model}_{dataset}_nlb_5ms*.yaml"))
     assert paths, f"Missing 5 ms NLB recipe for {model} on {dataset}"
     # The unsuffixed recipe sorts before optional variants; some methods use
-    # the established _train or _ladys suffix for their canonical recipe.
+    # the established _train or _nlb2 suffix for their canonical recipe.
     config = load_experiment_config(str(paths[0]))
     assert config.dataset.name == dataset
     assert config.dataset.bin_size_ms == 5

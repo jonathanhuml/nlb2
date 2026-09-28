@@ -7,9 +7,9 @@ LangevinFlow sequential VAE for binned neural spike counts.
 ## Source
 
 - Registry name: `langevin_flow`
-- Model class: `ladys.models.langevin_flow.LangevinFlow`
-- Config class: `ladys.models.langevin_flow.LangevinFlowConfig`
-- Source file: `src/ladys/models/langevin_flow.py`
+- Model class: `nlb2.models.langevin_flow.LangevinFlow`
+- Config class: `nlb2.models.langevin_flow.LangevinFlowConfig`
+- Source file: `src/nlb2/models/langevin_flow.py`
 
 ## When to use
 
@@ -64,7 +64,7 @@ Config for the LangevinFlow sequential VAE.
 | `name` | `Literal['langevin_flow']` | `'langevin_flow'` |
 | `objective` | `str` | `'langevin_flow_elbo'` |
 | `hidden_size` | `int` | `64` |
-| `initialization` | `Literal['ladys', 'upstream']` | `'ladys'` |
+| `initialization` | `Literal['nlb2', 'upstream']` | `'nlb2'` |
 | `encoder_input_alignment` | `Literal['current', 'upstream_lagged']` | `'current'` |
 | `output_neurons` | `Optional[int]` | `None` |
 | `output_mode` | `Literal['auto', 'heldin', 'heldin_heldout']` | `'auto'` |

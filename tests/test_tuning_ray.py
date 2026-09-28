@@ -8,9 +8,9 @@ import pytest
 ray = pytest.importorskip("ray")
 pytest.importorskip("optuna")
 
-from ladys import Experiment, Study, StudyResult
-from ladys import StudyConfig
-from ladys.tuning.ray_backend import _search_algorithm
+from nlb2 import Experiment, Study, StudyResult
+from nlb2 import StudyConfig
+from nlb2.tuning.ray_backend import _search_algorithm
 
 
 @pytest.fixture(scope="module", autouse=True)
