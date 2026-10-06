@@ -474,7 +474,7 @@ class MgplvmFullBatchGradientStrategy(OptimizationStrategy):
         return StepResult.from_loss(loss, batch_size=int(x.shape[0]))
 
     def _setup_optimizer(self, mod: torch.nn.Module) -> None:
-        from mgplvm.optimisers.svgp import sort_params
+        from nlb2.models.bgpfa_core.optim import sort_params
 
         def no_op_hook(grad):
             return grad

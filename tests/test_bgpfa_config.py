@@ -2,6 +2,7 @@
 
 import io
 from pathlib import Path
+import sys
 
 import numpy as np
 import pytest
@@ -35,6 +36,26 @@ def small_config(**kwargs):
         },
         **kwargs,
     )
+
+
+@pytest.mark.parametrize("likelihood", ["gaussian", "poisson"])
+@pytest.mark.parametrize("n_time", [7, 8])
+def test_training_and_inference_without_mgplvm(monkeypatch, likelihood, n_time):
+    # An installed copy of mgplvm must not mask a remaining runtime dependency.
+    monkeypatch.setitem(sys.modules, "mgplvm", None)
+    torch.manual_seed(5)
+    x = torch.poisson(torch.ones(3, n_time, 3))
+    config = small_config(likelihood=likelihood)
+    model = config.build(n_neurons=3, n_time=n_time)
+    strategy = build_strategy(config.optimization)
+    strategy.setup(model)
+    assert np.isfinite(strategy.step(model, x, epoch=0).loss)
+    model.eval()
+    output = model(x[:2] + 1)
+    assert output.rates.shape == (2, n_time, 3)
+    assert output.latents.shape == (2, n_time, 2)
+    assert torch.isfinite(output.rates).all()
+    assert torch.isfinite(output.latents).all()
 
 
 @pytest.mark.parametrize("n_neurons,latent_dim", [(1, 1), (1, 3), (2, 2), (2, 3), (3, 5)])
@@ -80,11 +101,11 @@ def test_bgpfa_rejects_time_axes_without_a_gp_interval(n_time):
         BGPFAConfig().build(n_neurons=3, n_time=n_time)
 
 
-@pytest.fixture
-def fitted():
+@pytest.fixture(params=["gaussian", "poisson"])
+def fitted(request):
     torch.manual_seed(42)
     x = torch.poisson(torch.ones(4, 8, 3))
-    config = small_config()
+    config = small_config(likelihood=request.param)
     model = config.build(n_neurons=3, n_time=8)
     strategy = build_strategy(config.optimization)
     strategy.setup(model)

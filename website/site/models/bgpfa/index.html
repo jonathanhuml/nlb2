@@ -186,9 +186,9 @@ when matching reference bGPFA scripts that report fixed optimizer-step
 budgets.</p>
 <h2 id="outputs">Outputs</h2>
 <p><code>forward</code> returns predictive rates/reconstructions, variational latent
-means, and ELBO terms in <code>extras</code>. The core mgplvm implementation is
-vendored in <code>src/mgplvm</code>; this class only adapts it to the NLB2 model,
-loss, and trainer contracts. Evaluation infers a new posterior from each
+means, and ELBO terms in <code>extras</code>. The required numerical routines from
+mgplvm live in <code>nlb2.models.bgpfa_core</code>, alongside this NLB2 adapter.
+Evaluation infers a new posterior from each
 input batch with the learned observation model and GP prior held fixed.
 The <code>nlb_latent_infer_*</code> options control this inference for both NLB and
 synthetic evaluation. Predictions are expected counts per input bin.</p>

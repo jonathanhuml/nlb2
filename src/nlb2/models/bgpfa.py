@@ -1,8 +1,7 @@
-"""Bayesian GPFA adapter backed by mgplvm-pytorch."""
+"""Bayesian GPFA with an internal numerical core adapted from mgplvm-pytorch."""
 
 from __future__ import annotations
 
-import importlib
 import math
 import numpy as np
 from typing import Any, Literal, Optional
@@ -118,9 +117,9 @@ class BGPFA(BaseDynamicsModel):
     ## Outputs
 
     `forward` returns predictive rates/reconstructions, variational latent
-    means, and ELBO terms in `extras`. The core mgplvm implementation is
-    vendored in `src/mgplvm`; this class only adapts it to the NLB2 model,
-    loss, and trainer contracts. Evaluation infers a new posterior from each
+    means, and ELBO terms in `extras`. The required numerical routines from
+    mgplvm live in `nlb2.models.bgpfa_core`, alongside this NLB2 adapter.
+    Evaluation infers a new posterior from each
     input batch with the learned observation model and GP prior held fixed.
     The `nlb_latent_infer_*` options control this inference for both NLB and
     synthetic evaluation. Predictions are expected counts per input bin.
@@ -307,7 +306,8 @@ class BGPFA(BaseDynamicsModel):
         if max_steps < 1 or n_mc < 1 or lrate <= 0 or burnin < 1:
             raise ValueError("BGPFA latent inference requires positive steps, samples, lr and burnin.")
 
-        mgp = _require_mgplvm()
+        from .bgpfa_core.optim import fit_latents
+
         x = self._coerce_observations(x).detach()
         if x.is_inference():
             x = x.clone()
@@ -321,42 +321,40 @@ class BGPFA(BaseDynamicsModel):
         for param in (mod.lat_dist._nu, mod.lat_dist._scale, mod.lat_dist._c):
             param.requires_grad = True
 
-        params = mgp.crossval.training_params(
+        fit_latents(
+            mod,
+            self._to_mgplvm_observations(x),
             max_steps=max_steps,
             n_mc=n_mc,
             lrate=lrate,
-            print_every=np.nan,
             burnin=burnin,
-            mask_Ts=lambda value: value * 1,
         )
-        mgp.crossval.train_model(mod, self._to_mgplvm_observations(x), params)
         mod.requires_grad_(False)
         mod.eval()
         self._eval_cache = (x.detach().clone(), mod)
         return mod
 
     def _build_mgplvm_model(self, x: Tensor, *, initialize: bool = True) -> torch.nn.Module:
-        mgp = _require_mgplvm()
+        from .bgpfa_core.latent import GP_circ
+        from .bgpfa_core.model import Lvgplvm
+
         y_np = self._to_mgplvm_observations(x).detach().cpu().numpy() if initialize else None
         n_trials = int(x.shape[0])
-        manif = mgp.manifolds.Euclid(self.n_time, self.latent_dim)
-        lat_dist = mgp.rdist.GP_circ(
-            manif,
+        lat_dist = GP_circ(
+            self.latent_dim,
             self.n_time,
             n_trials,
             self.fit_ts.to(x.device, x.dtype),
             _scale=self.latent_scale_init,
             ell=self.ell0,
         )
-        lprior = mgp.lpriors.Null(manif)
-        likelihood = self._build_likelihood(mgp, x, y_np)
-        mod = mgp.models.Lvgplvm(
+        likelihood = self._build_likelihood(x, y_np)
+        mod = Lvgplvm(
             self.n_neurons,
             self.n_time,
             self.latent_dim,
             n_trials,
             lat_dist,
-            lprior,
             likelihood,
             Y=y_np,
             learn_scale=self.learn_scale,
@@ -424,16 +422,18 @@ class BGPFA(BaseDynamicsModel):
                 )
                 obs._q_mu.copy_(q_mu.unsqueeze(0))
 
-    def _build_likelihood(self, mgp: Any, x: Tensor, y_np: Any) -> torch.nn.Module:
+    def _build_likelihood(self, x: Tensor, y_np: Any) -> torch.nn.Module:
+        from .bgpfa_core.likelihoods import Gaussian, Poisson
+
         if self.likelihood == "gaussian":
             sigma = 0.1 * torch.ones(self.n_neurons, device=x.device, dtype=x.dtype)
-            return mgp.likelihoods.Gaussian(
+            return Gaussian(
                 self.n_neurons,
                 Y=y_np,
                 sigma=sigma,
             )
         if self.likelihood == "poisson":
-            return mgp.likelihoods.Poisson(
+            return Poisson(
                 self.n_neurons,
                 binsize=self.binsize,
             )
@@ -526,14 +526,3 @@ class BGPFA(BaseDynamicsModel):
             raise ValueError(f"Expected {self.n_time} time bins, got {int(x.shape[1])}.")
         if int(x.shape[2]) != self.n_neurons:
             raise ValueError(f"Expected {self.n_neurons} neurons, got {int(x.shape[2])}.")
-
-
-def _require_mgplvm() -> Any:
-    try:
-        return importlib.import_module("mgplvm")
-    except ImportError as exc:
-        raise ImportError(
-            "BGPFA requires the vendored `mgplvm` package and its runtime "
-            "dependencies. Reinstall NLB2 after this change, and make sure "
-            "`scikit-learn` is available in the active environment."
-        ) from exc

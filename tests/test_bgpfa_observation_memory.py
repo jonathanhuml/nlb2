@@ -5,8 +5,8 @@ import copy
 import pytest
 import torch
 
-from mgplvm.likelihoods import Gaussian
-from mgplvm.models.bfa import Bvfa
+from nlb2.models.bgpfa_core.likelihoods import Gaussian
+from nlb2.models.bgpfa_core.observation import Bvfa
 
 
 def observation_model(*, neurons=5, dimensions=3, trials=4, time=7, tied=True, dtype=torch.float64):

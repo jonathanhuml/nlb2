@@ -1,20 +1,19 @@
-import torch
+"""Circulant variational GP posterior adapted from mgplvm (see LICENSE)."""
+
 import math
-import numpy as np
-from torch import nn, Tensor
-from torch.distributions.multivariate_normal import MultivariateNormal
-from ..utils import softplus, inv_softplus
-from ..manifolds.base import Manifold
-from .common import Rdist
-from typing import Optional
-from ..fast_utils.toeplitz import sym_toeplitz_matmul
+
+import torch
+from torch import nn
+from torch.fft import rfft, irfft
+
+from .numerics import softplus, inv_softplus, sym_toeplitz_matmul
 
 
-class GPbase(Rdist):
+class GPbase(nn.Module):
     name = "GPbase"  # it is important that child classes have "GP" in their name, this is used in control flow
 
     def __init__(self,
-                 manif: Manifold,
+                 d: int,
                  m: int,
                  n_samples: int,
                  ts: torch.Tensor,
@@ -23,30 +22,27 @@ class GPbase(Rdist):
         """
         Parameters
         ----------
-        manif: Manifold
-            manifold of ReLie
+        d: int
+            latent dimensionality
         m : int
             number of conditions/timepoints
         n_samples: int
             number of samples
         ts: Tensor
             input timepoints for each sample (n_samples x 1 x m)
-        mu : Optional[np.ndarray]
-            initialization of the vartiational means (m x d2)
-            
+
         Notes
         -----
         Our GP has prior N(0, K)
         We parameterize our posterior as N(K2 v, K2 I^2 K2)
         where K2 K2 = K and I(s) is some inner matrix which can take different forms.
         s is a vector of scale parameters for each time point.
-        
+
         """
 
-        super(GPbase, self).__init__(manif, 1)  #kmax = 1
+        super().__init__()
 
-        self.manif = manif
-        self.d = manif.d
+        self.d = d
         self.m = m
 
         #initialize GP mean parameters
@@ -74,15 +70,12 @@ class GPbase(Rdist):
         dts_sq = torch.square(ts - ts[..., :1])  #(n_samples x 1 x m)
         #sum over _input_ dimension, add an axis for _output_ dimension
         dts_sq = dts_sq.sum(-2)[:, None, ...]  #(n_samples x 1 x m)
-        #print('dts sqr:', dts_sq.shape)
         self.dts_sq = nn.Parameter(data=dts_sq, requires_grad=False)
 
         self.dt = (ts[0, 0, 1] - ts[0, 0, 0]).item()  #scale by dt
 
     @property
     def scale(self) -> torch.Tensor:
-        #print(self._scale.shape, type(self._scale))
-        #print(softplus(self._scale).shape)
         return softplus(self._scale)
 
     @property
@@ -107,8 +100,6 @@ class GPbase(Rdist):
 
     def K_half(self, sample_idxs=None):
         """compute one column of the square root of the prior matrix"""
-        nu = self.nu  #mean parameters
-
         #K^(1/2) has length scale ell/sqrt(2) if K has ell
         sqrt_two = self.ell.new_tensor(math.sqrt(2.0))
         ell_half = self.ell / sqrt_two
@@ -133,26 +124,14 @@ class GPbase(Rdist):
         This should be implemented for each class separately.
         v is (n_samples x d x m x n_mc) where n_samples is the number of sample_idxs
         """
-        pass
+        raise NotImplementedError
 
     def kl(self, batch_idxs=None, sample_idxs=None):
         """
         Compute KL divergence between prior and posterior.
         This should be implemented for each class separately
         """
-        pass
-
-    def full_cov(self):
-        """Compute the full covariance Khalf @ I @ I @ Khalf"""
-        v = torch.diag_embed(torch.ones(
-            self._scale.shape))  #(n_samples x d x m x m)
-        I = self.I_v(v)  #(n_samples x d x m x m)
-        K_half = self.K_half()  #(n_samples x d x m)
-
-        Khalf_I = sym_toeplitz_matmul(K_half, I)  #(n_samples x d x m x m)
-        K_post = Khalf_I @ Khalf_I.transpose(-1, -2)  #Kpost = Khalf@I@I@Khalf
-
-        return K_post.detach()
+        raise NotImplementedError
 
     def sample(self,
                size,
@@ -199,13 +178,114 @@ class GPbase(Rdist):
     def concentration_parameters(self):
         return [self._scale, self._ell]
 
-    def msg(self, Y=None, batch_idxs=None, sample_idxs=None):
 
-        mu_mag = torch.sqrt(torch.mean(self.nu**2)).item()
-        sig = torch.median(self.scale).item()
-        ell = self.ell.mean().item()
+class GP_circ(GPbase):
+    name = "GP_circ"
 
-        string = (' |mu| {:.3f} | sig {:.3f} | prior_ell {:.3f} |').format(
-            mu_mag, sig, ell)
+    def __init__(self,
+                 d: int,
+                 m: int,
+                 n_samples: int,
+                 ts: torch.Tensor,
+                 _scale=0.9,
+                 ell=None):
+        """
+        Parameters
+        ----------
+        d: int
+            latent dimensionality
+        m : int
+            number of conditions/timepoints
+        n_samples: int
+            number of samples
+        ts: Tensor
+            input timepoints for each sample (n_samples x 1 x m)
 
-        return string
+        Notes
+        -----
+        We parameterize our posterior as N(K2 v, K2 SCCS K2) where K2@K2 = Kprior, S is diagonal and C is circulant
+        """
+
+        super(GP_circ, self).__init__(d,
+                                      m,
+                                      n_samples,
+                                      ts,
+                                      _scale=_scale,
+                                      ell=ell)
+
+        #initialize circulant parameters
+        if self.m % 2 == 0:
+            _c = torch.ones(n_samples, self.d, int(m / 2) + 1)
+        else:
+            _c = torch.ones(n_samples, self.d, int((m + 1) / 2))
+        self._c = nn.Parameter(data=inv_softplus(_c), requires_grad=True)
+
+    @property
+    def c(self) -> torch.Tensor:
+        return softplus(self._c)
+
+    @property
+    def prms(self):
+        return self.nu, self.scale, self.ell, self.c
+
+    def I_v(self, v, sample_idxs=None):
+        """
+        Compute I @ v for some vector v.
+        Here I = S C.
+        v is (n_samples x d x m x n_mc) where n_samples is the number of sample_idxs
+        """
+        scale, c = self.scale, self.c
+        if sample_idxs is not None:
+            scale = scale[sample_idxs, ...]  #(n_samples x d x m)
+            c = c[sample_idxs, ...]  #(n_samples x d x m/2)
+
+        #Fourier transform (n_samples x d x n_mc x m/2)
+        rv = rfft(v.transpose(-1, -2).to(scale.device))
+
+        #inverse fourier transform of product (n_samples x d x m x n_mc)
+        Cv = irfft(c[..., None, :] * rv, n=self.m).transpose(-1, -2)
+
+        #multiply by diagonal scale
+        SCv = scale[..., None] * Cv
+
+
+        return SCv
+
+    def kl(self, batch_idxs=None, sample_idxs=None):
+        """
+        Compute KL divergence between prior and posterior.
+        This should be implemented for each class separately
+        """
+        #(n_samples x d x m), (n_samples x d x m), (n_samples x d x m/2)
+        nu, S, c = self.nu, self.scale, self.c
+
+        if sample_idxs is not None:
+            nu = nu[sample_idxs, ...]
+            S = S[sample_idxs, ...]
+            c = c[sample_idxs, ...]
+
+        #n_samples x d x m
+        Cr = irfft(self.c,
+                   n=self.m)  #first row of C given by inverse Fourier transform
+
+        #(n_samples x d)
+        TrTerm = torch.square(S).sum(-1) * torch.square(Cr).sum(-1)
+        MeanTerm = torch.square(nu).sum(-1)  #(n_samples x d)
+        DimTerm = S.shape[-1]
+        LogSTerm = 2 * (torch.log(S)).sum(-1)  #(n_samples x d)
+
+        #c[0] + 2*c[1:end] (n_samples x d)
+        LogCTerm = 2 * (torch.log(c)).sum(-1) - torch.log(c[..., 0])
+        if self.m % 2 == 0:
+            #c[0] + c[-1] + 2*c[1:-1]
+            LogCTerm = LogCTerm - torch.log(c[..., -1])
+        LogCTerm = 2 * LogCTerm  #one for each C
+
+        kl = 0.5 * (TrTerm + MeanTerm - DimTerm - LogSTerm - LogCTerm)
+        if batch_idxs is not None:  #scale by batch size
+            kl = kl * len(batch_idxs) / self.m
+
+        return kl
+
+    def gmu_parameters(self):
+        return [self._nu, self._c]

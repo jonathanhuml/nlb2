@@ -348,9 +348,9 @@ def test_bgpfa_config_uses_differentiable_full_batch_strategy():
 
 @pytest.mark.skipif(
     importlib.util.find_spec("sklearn") is None,
-    reason="BGPFA vendored mgplvm smoke test requires scikit-learn",
+    reason="BGPFA smoke test requires scikit-learn",
 )
-def test_bgpfa_vendored_mgplvm_smoke():
+def test_bgpfa_internal_core_smoke():
     config = LorenzDatasetConfig(
         neurons=4,
         num_inits=1,
