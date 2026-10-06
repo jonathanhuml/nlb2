@@ -9,7 +9,7 @@ description = "PyTorch benchmark scaffolding for latent neural dynamics models."
 readme = "README.md"
 requires-python = ">=3.9"
 license = "MIT"
-license-files = ["LICENSE", "src/nlb2/models/bgpfa_core/LICENSE"]
+license-files = ["LICENSE"]
 authors = [
   { name = "Jon Huml" },
 ]
@@ -62,10 +62,6 @@ Issues = "https://github.com/jonathanhuml/nlb2/issues"
 [tool.setuptools.packages.find]
 where = ["src"]
 include = ["nlb2", "nlb2.*"]
-
-[tool.setuptools.package-data]
-"nlb2.models" = ["mint_presets.yaml"]
-"nlb2.models.bgpfa_core" = ["LICENSE"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

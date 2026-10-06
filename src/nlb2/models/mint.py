@@ -1278,15 +1278,77 @@ class _MINTAllenVCNAdapter:
         )
 
 
-def get_mint_config(dataset: str, *, nlb_neural_state_defaults: bool = False) -> Tuple[Settings, HyperParams]:
-    """Load paper reproduction presets; prepared data overrides sampling/layout."""
-    from importlib.resources import files
-    import yaml
+# Original task adapters operate on millisecond NWB/MAT samples. Prepared-data
+# runs derive their sampling interval and alignment from the training dataset.
+_NLB_HYPERPARAMS = {
+    "causal": False,
+    "window_length": 500,
+    "n_candidates": 2,
+    "min_rate": 0.1,
+}
+_SYNTHETIC_HYPERPARAMS = {
+    "trajectories_alignment": (0, 100),
+    "min_lambda": 0.001,
+    "sigma": 2,
+    "Delta": 1,
+    "window_length": 6,
+    "n_candidates": 4,
+    "causal": False,
+    "n_trial_dims": None,
+}
+_MINT_PRESETS = {
+    "area2_bump": {
+        "settings": {"trial_alignment": (-700, 851), "test_alignment": (-100, 501)},
+        "hyperparams": {"trajectories_alignment": (-350, 751), "sigma": 25, "window_length": 240},
+        "nlb_hyperparams": _NLB_HYPERPARAMS,
+    },
+    "mc_maze": {
+        "settings": {"trial_alignment": (-800, 901), "test_alignment": (-250, 451)},
+        "hyperparams": {
+            "trajectories_alignment": (-500, 701), "sigma": 30,
+            "n_cond_dims": 21, "window_length": 300,
+        },
+        "nlb_hyperparams": _NLB_HYPERPARAMS,
+    },
+    "mc_rtt": {
+        "settings": {"trial_alignment": (-600, 1201), "test_alignment": (0, 600)},
+        "hyperparams": {
+            "window_length": 480, "n_candidates": 6, "interp_within_trajectories": True,
+        },
+        "nlb_hyperparams": {**_NLB_HYPERPARAMS, "n_candidates": 5},
+    },
+    "dmfc_rsg": {
+        "settings": {"trial_alignment": (-1950, 750), "test_alignment": (-1500, 0)},
+        "hyperparams": {
+            "trajectories_alignment": (-1950, 750), "sigma": 55,
+            "n_neural_dims": 49, "n_cond_dims": 17, "n_trial_dims": None,
+            "causal": False, "window_length": 1500, "dmfc_section_count": 6,
+        },
+        "nlb_hyperparams": {**_NLB_HYPERPARAMS, "window_length": 1500},
+    },
+    "lorenz": {
+        "settings": {"Ts": 0.2, "trial_alignment": (0, 100), "test_alignment": (0, 100)},
+        "hyperparams": _SYNTHETIC_HYPERPARAMS,
+    },
+    "chaotic_rnn": {
+        "settings": {"Ts": 0.01, "trial_alignment": (0, 100), "test_alignment": (0, 100)},
+        "hyperparams": _SYNTHETIC_HYPERPARAMS,
+    },
+    "auto": {
+        "hyperparams": {**_SYNTHETIC_HYPERPARAMS, "n_candidates": 2},
+    },
+    "allen_vcn": {
+        "settings": {"Ts": 0.02, "trial_alignment": (0, 100), "test_alignment": (0, 100)},
+        "hyperparams": {**_SYNTHETIC_HYPERPARAMS, "interp": 0},
+    },
+}
 
-    presets = yaml.safe_load(files("nlb2.models").joinpath("mint_presets.yaml").read_text())
-    if dataset not in presets:
+
+def get_mint_config(dataset: str, *, nlb_neural_state_defaults: bool = False) -> Tuple[Settings, HyperParams]:
+    """Build paper reproduction presets; prepared data overrides sampling/layout."""
+    if dataset not in _MINT_PRESETS:
         raise ValueError(f"Unknown MINT dataset: {dataset}")
-    preset = presets[dataset]
+    preset = _MINT_PRESETS[dataset]
     settings_values = dict(preset.get("settings", {}))
     hp_values = dict(preset.get("hyperparams", {}))
     if nlb_neural_state_defaults:

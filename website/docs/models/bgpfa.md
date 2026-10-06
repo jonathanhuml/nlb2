@@ -31,10 +31,10 @@ budgets.
 ## Outputs
 
 `forward` returns predictive rates/reconstructions, variational latent
-means, and ELBO terms in `extras`. The required numerical routines from
-mgplvm live in `nlb2.models.bgpfa_core`, alongside this NLB2 adapter.
-Evaluation infers a new posterior from each
-input batch with the learned observation model and GP prior held fixed.
+means, and ELBO terms in `extras`. This file includes the required
+numerical routines adapted from mgplvm. Evaluation infers a new posterior
+from each input batch with the learned observation model and GP prior held
+fixed.
 The `nlb_latent_infer_*` options control this inference for both NLB and
 synthetic evaluation. Predictions are expected counts per input bin.
 

@@ -1,6 +1,8 @@
+from dataclasses import asdict
 from pathlib import Path
 
 import numpy as np
+import pytest
 import torch
 
 from nlb2.config import load_experiment_config
@@ -62,6 +64,23 @@ def test_mint_dmfc_uses_paper_trajectory_defaults():
     assert hyperparams.Delta == 20
     assert hyperparams.window_length == 1500
     assert hyperparams.dmfc_section_count == 6
+
+
+@pytest.mark.parametrize("dataset", [
+    "auto", "lorenz", "chaotic_rnn", "allen_vcn",
+    "area2_bump", "mc_maze", "mc_rtt", "dmfc_rsg",
+])
+def test_mint_preset_calls_do_not_share_mutable_configuration(dataset):
+    paper_settings, paper_hyperparams = get_mint_config(dataset)
+    expected = (asdict(paper_settings), asdict(paper_hyperparams))
+    settings, hyperparams = get_mint_config(dataset, nlb_neural_state_defaults=True)
+    settings.Ts = 999.0
+    hyperparams.window_length = 999
+    paper_settings.Ts = 123.0
+    paper_hyperparams.window_length = 123
+
+    actual_settings, actual_hyperparams = get_mint_config(dataset)
+    assert (asdict(actual_settings), asdict(actual_hyperparams)) == expected
 
 
 def test_mint_lorenz_library_defaults_to_smoothed_spikes():

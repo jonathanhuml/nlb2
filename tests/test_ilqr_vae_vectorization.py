@@ -7,8 +7,7 @@ from types import MethodType
 import pytest
 import torch
 
-from nlb2.models.ilqr_vae import ILQRVAEConfig
-from nlb2.models.ilqr_vae_core.model import _TapeStep
+from nlb2.models.ilqr_vae import ILQRVAEConfig, _TapeStep
 
 
 def sequential_objective(self, controls, spikes, *, held_in_neurons, include_constants=False):
