@@ -1,0 +1,9 @@
+{
+ "evaluated": "2026-11-21T03:37:41-0800",
+ "rows": 2349,
+ "lockfile_sha256": "a32ad9141a04ddccf02078d060edde5cff99a360fceaed55cff435963c152e4b",
+ "test_metrics_sha256": "e337b40c764a691a81a77f1af1a95706abf81a430f6d482b10a5460a678a8f6b",
+ "evaluate_v2_sha256": "4b15cef1c42aaa83aca95d90a08c99bc648a749479e441b1b153fdaa7545e643",
+ "device": "cuda",
+ "torch": "2.14.1+cu130"
+}
