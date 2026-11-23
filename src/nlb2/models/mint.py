@@ -17,7 +17,7 @@ from typing import Callable, Dict, Iterable, List, Literal, Mapping, Optional, S
 import h5py
 import numpy as np
 import torch
-from pydantic import Field
+from pydantic import AliasChoices, Field
 from torch import Tensor
 from torch.utils.data import Subset
 
@@ -36,7 +36,8 @@ class Settings:
     trial_alignment: range = range(0)
     test_alignment: range = range(0)
     CondInfo: Optional[object] = None
-    lorenz_library_source: str = "smoothed_spikes"
+    # "smoothed_spikes" | "true_rates" (oracle) | "provided_rates" (internal: rates passed to fit_library)
+    library_source: str = "smoothed_spikes"
     library_rate_source: str = "spikes"
     dmfc_event_offsets: Optional[Dict[str, np.ndarray]] = None
     dmfc_condition_rows: Optional[np.ndarray] = None
@@ -182,12 +183,13 @@ class MINTConfig(BaseModelConfig):
     `lfads_epochs` controls the direct `fit_training_data` helper and legacy
     reproduction runners only.
 
-    For synthetic Lorenz and chaotic-RNN tasks, NLB2 builds the MINT trajectory
-    library from repeated training trials. With `train_source="h5"`, the default
-    `lorenz_library_source="smoothed_spikes"` estimates library rates by
-    Gaussian-smoothing training spikes and averaging by condition.
-    `lorenz_library_source="true_rates"` is an oracle sanity-check mode only
-    and should not be used for fair method comparisons.
+    For synthetic Lorenz and chaotic-RNN tasks and Allen VCN data, NLB2 builds
+    the MINT trajectory library from repeated training trials. With
+    `train_source="h5"`, the default `library_source="smoothed_spikes"`
+    estimates library rates by Gaussian-smoothing training spikes and averaging
+    by condition. `library_source="true_rates"` is an oracle sanity-check mode
+    only and should not be used for fair method comparisons. Configs saved with
+    the former name `lorenz_library_source` still load.
     The default Lorenz split repeats the same initial-condition trajectories
     across train and validation trials, so this benchmark measures denoising of
     seen trajectories rather than interpolation to unseen trajectories.
@@ -212,7 +214,10 @@ class MINTConfig(BaseModelConfig):
     mat_data_root: Optional[str] = None
     target_h5: Optional[str] = None
     eval_bin_size_ms: int = 5
-    lorenz_library_source: Literal["smoothed_spikes", "true_rates"] = "smoothed_spikes"
+    library_source: Literal["smoothed_spikes", "true_rates"] = Field(
+        default="smoothed_spikes",
+        validation_alias=AliasChoices("library_source", "lorenz_library_source"),
+    )
     n_candidates: Optional[int] = Field(default=None, ge=1)
     window_length: Optional[int] = Field(default=None, ge=1)
     delta: Optional[int] = Field(default=None, ge=1)
@@ -282,12 +287,13 @@ class MINT(BaseDynamicsModel):
     trajectories. DMFC averages prepared condition-indexed trials. This H5
     adapter does not reproduce the original event-warped DMFC NWB procedure.
     Prepared NLB and Allen data use the standard `Experiment` and `nlb2 run`
-    fit/save/load workflow. Legacy NWB/MAT adapters remain explicit options.
+    fit/save/load workflow. The legacy NWB/MAT adapters (`train_source="nwb"`
+    or `"mat"`) run through the dedicated `nlb2.mint_nlb` runner instead.
 
     ## Synthetic datasets
 
     The synthetic Lorenz and chaotic-RNN adapters are NLB2-specific trajectory
-    builders. With the default `lorenz_library_source="smoothed_spikes"`, the
+    builders. With the default `library_source="smoothed_spikes"`, the
     library is estimated from training spikes by Gaussian smoothing and
     condition averaging. This keeps the comparison non-oracular while still
     matching MINT's assumption that useful trajectory templates are learned
@@ -450,7 +456,7 @@ class MINT(BaseDynamicsModel):
             elif cond is None:
                 cond = self._training_conditions[index] if self._training_conditions is not None else index
             conditions.append(int(cond))
-            if self.config.lorenz_library_source == "true_rates" and self.config.train_source != "lfads":
+            if self.config.library_source == "true_rates" and self.config.train_source != "lfads":
                 if "rates" not in sample:
                     raise ValueError("Oracle MINT fitting requires explicitly provided training rates.")
                 unit = sample.get("rates_unit", "counts")
@@ -505,7 +511,7 @@ class MINT(BaseDynamicsModel):
         return self
 
     def _apply_config_overrides(self) -> None:
-        self.settings.lorenz_library_source = self.config.lorenz_library_source
+        self.settings.library_source = self.config.library_source
         if self.config.n_candidates is not None:
             self.hyperparams.n_candidates = int(self.config.n_candidates)
         if self.config.window_length is not None:
@@ -1177,12 +1183,13 @@ class _MINTAllenVCNAdapter:
                 n_full=int(full_trials[0].shape[0]),
                 device=device,
             )
-            previous_source = model.settings.lorenz_library_source
-            model.settings.lorenz_library_source = "true_rates"
+            # Build the library from the LFADS rates passed in, not smoothed spikes.
+            previous_source = model.settings.library_source
+            model.settings.library_source = "provided_rates"
             try:
                 model.fit_library(full_trials, rate_trials, conditions)
             finally:
-                model.settings.lorenz_library_source = previous_source
+                model.settings.library_source = previous_source
             return
         model.fit_library(full_trials, full_trials, conditions)
 
@@ -2125,8 +2132,8 @@ def fit_trajectories(S, Z, condition, settings, hyperparams):
         rates = [item[4:] * settings.Ts * hyperparams.Delta for item in Z]
         return rates, vel, labels
     if settings.task in {"auto", "chaotic_rnn", "lorenz", "allen_vcn"}:
-        source = getattr(settings, "lorenz_library_source", "smoothed_spikes")
-        if source == "true_rates":
+        source = getattr(settings, "library_source", "smoothed_spikes")
+        if source in {"true_rates", "provided_rates"}:
             rate_trials = [item.to(TORCH_DTYPE) for item in Z]
         elif source == "smoothed_spikes":
             if int(hyperparams.sigma) > 0:
@@ -2140,7 +2147,7 @@ def fit_trajectories(S, Z, condition, settings, hyperparams):
             else:
                 rate_trials = [spikes.to(TORCH_DTYPE) * hyperparams.Delta for spikes in S]
         else:
-            raise ValueError(f"Unknown Lorenz MINT library source: {source}")
+            raise ValueError(f"Unknown MINT library source: {source}")
 
         n_time = rate_trials[0].shape[1]
         if len(settings.trial_alignment) == n_time:

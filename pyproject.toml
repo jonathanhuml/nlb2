@@ -46,10 +46,9 @@ benchmarks = [
   "tueplots>=0.2.4; python_version >= '3.10'",
 ]
 data = ["dandi"]
-# NLB data preparation and full scoring need nlb-tools, which is installed
-# separately with `pip install --no-deps nlb-tools`: every PyPI release pins
-# pandas<=1.3.4, which conflicts with pandas>=1.5. nlb-tools 0.0.4 also mutates
-# NumPy views, which breaks under pandas 3 copy-on-write.
+# Building NLB tensors uses nlb-tools 0.0.4, bundled in nlb2._vendor because
+# every PyPI release pins pandas<=1.3.4. It mutates pandas views, which pandas 3
+# copy-on-write breaks, so NLB data preparation needs pandas<3.
 nlb = ["pandas>=1.5,<3"]
 tuning = ["ray[tune]>=2.43,<3", "optuna>=3,<5"]
 
@@ -65,6 +64,9 @@ Issues = "https://github.com/jonathanhuml/nlb2/issues"
 [tool.setuptools.packages.find]
 where = ["src"]
 include = ["nlb2", "nlb2.*"]
+
+[tool.setuptools.package-data]
+"nlb2._vendor.nlb_tools" = ["LICENSE"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

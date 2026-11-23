@@ -134,13 +134,8 @@ def evaluate_nlb_submission(
 ) -> list[dict[str, dict[str, float]]]:
     """Run the full nlb_tools EvalAI-style evaluator on an H5 submission."""
 
-    try:
-        from nlb_tools.evaluation import evaluate
-    except ImportError as exc:
-        raise RuntimeError(
-            "nlb_tools is required for full NLB H5 evaluation. Install it with "
-            "`pip install -e \".[nlb]\"` and `pip install --no-deps nlb-tools`."
-        ) from exc
+    from nlb2._vendor.nlb_tools.evaluation import evaluate
+
     return evaluate(str(target_h5), str(submission_h5))
 
 
