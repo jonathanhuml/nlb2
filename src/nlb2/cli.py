@@ -177,6 +177,11 @@ def run_command(args: argparse.Namespace) -> int:
 
 def _run_experiment(config: ExperimentConfig, *, resume_from: str | None = None) -> None:
     if isinstance(config.model, MINTConfig) and config.model.train_source in {"mat", "nwb"}:
+        print(
+            f"MINT train_source={config.model.train_source!r} runs through the dedicated "
+            "MINT NLB runner (nlb2.mint_nlb), not Experiment.",
+            flush=True,
+        )
         result = run_mint_nlb(config)
         print(f"Wrote NLB2 run: {result.run_dir}")
         print("Metrics:")

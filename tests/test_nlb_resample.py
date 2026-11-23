@@ -4,9 +4,15 @@ import numpy as np
 import pandas as pd
 import pytest
 
-NWBDataset = pytest.importorskip("nlb_tools.nwb_interface").NWBDataset
-
+from nlb2._vendor.nlb_tools.nwb_interface import NWBDataset
 from nlb2.datasets._nlb_resample import resample_nwb_dataset
+
+# The bundled nlb_tools writes into pandas-owned arrays, which pandas 3 makes
+# read-only; NLB data preparation refuses pandas 3 for the same reason.
+pytestmark = pytest.mark.skipif(
+    int(pd.__version__.split(".")[0]) >= 3,
+    reason="bundled nlb_tools needs pandas<3; install the nlb extra",
+)
 
 
 def dataset_with_data(data):

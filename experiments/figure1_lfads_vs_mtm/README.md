@@ -128,4 +128,4 @@ The `environment/requirements-*.txt` files are `pip freeze` records of the two m
 kept exactly as recorded. They do not list NLB2, because Stage 1 imported the source snapshot
 rather than an installed package. They also do not list nlb-tools, which Figure 1 does not use.
 Their pandas 3.1.1 satisfies NLB2's core requirements. Only NLB2's optional `nlb` extra keeps
-pandas below 3, for nlb-tools.
+pandas below 3, for the nlb-tools code NLB2 bundles to prepare NLB data.

@@ -32,13 +32,11 @@ Install from the repository root, including plotting dependencies:
 python -m pip install -e ".[benchmarks]"
 ```
 
-Working with NLB datasets (data preparation and full `nlb_tools` scoring) also
-needs `nlb-tools`. Its PyPI releases pin `pandas<=1.3.4`, so install it without
-dependencies on top of the `nlb` extra:
+Preparing NLB datasets from NWB files uses the bundled `nlb_tools`, which needs
+pandas below 3, so install the `nlb` extra for that:
 
 ```bash
 python -m pip install -e ".[benchmarks,nlb]"
-python -m pip install --no-deps nlb-tools
 ```
 
 Train LFADS on synthetic Lorenz data. This takes about 10 seconds on a laptop
@@ -63,6 +61,9 @@ any YAML recipe, with CLI overrides for the device and training budget:
 nlb2 run -c configs/experiment/synthetic/lorenz/lfads/lfads_lorenz.yaml \
   --device cpu --epochs 20
 ```
+
+We highly recommend the [notebook](https://github.com/jonathanhuml/nlb2/blob/main/tutorials/lorenz.ipynb)
+tutorial for a basic introduction to the API structure.
 
 ## Capabilities
 
@@ -101,6 +102,12 @@ experiment.config.trainer.epochs = 20
 result = experiment.run()
 print(result.metrics)
 ```
+
+One model has a second path. MINT configs with `train_source: mat` or `nwb`
+reproduce the original MINT NLB submissions with a dedicated runner,
+`nlb2.mint_nlb.run_mint_nlb`, instead of `Experiment`; `nlb2 run` dispatches
+them automatically. MINT on prepared NLB, Allen VCN and synthetic data uses
+`Experiment` like every other model.
 
 `Study` adds a search space and validation objective to an experiment config.
 It runs trials through Ray Tune and exports `best_config.yaml`, which can be

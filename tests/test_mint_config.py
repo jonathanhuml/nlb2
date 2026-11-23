@@ -49,7 +49,13 @@ def test_mint_python_and_yaml_defaults_use_training_spikes():
 
     for config in [MINTConfig(), MINTConfig.model_validate(load_yaml("configs/model/mint.yaml"))]:
         assert config.train_source == "h5"
-        assert config.lorenz_library_source == "smoothed_spikes"
+        assert config.library_source == "smoothed_spikes"
+
+
+def test_mint_config_accepts_legacy_lorenz_library_source_key():
+    config = MINTConfig.model_validate({"name": "mint", "lorenz_library_source": "true_rates"})
+    assert config.library_source == "true_rates"
+    assert "lorenz_library_source" not in config.model_dump()
 
 
 def test_mint_dmfc_uses_paper_trajectory_defaults():
@@ -102,6 +108,24 @@ def test_mint_lorenz_library_defaults_to_smoothed_spikes():
 
     model.fit_library(spikes, oracle_rates, np.asarray([0, 0]))
 
-    assert model.config.lorenz_library_source == "smoothed_spikes"
+    assert model.config.library_source == "smoothed_spikes"
     assert len(model.Omega_plus) == 1
     assert float(model.Omega_plus[0].max()) < 10.0
+
+
+def test_mint_provided_rates_build_library_from_supplied_rates():
+    model = MINTConfig(
+        dataset="lorenz",
+        sigma=1,
+        delta=1,
+        window_length=3,
+        n_candidates=1,
+    ).build(n_neurons=2, n_time=12)
+    spikes = [torch.zeros(2, 12), torch.ones(2, 12)]
+    supplied_rates = [torch.full((2, 12), 999.0), torch.full((2, 12), 999.0)]
+
+    model.settings.library_source = "provided_rates"
+    model.fit_library(spikes, supplied_rates, np.asarray([0, 0]))
+
+    assert len(model.Omega_plus) == 1
+    assert float(model.Omega_plus[0].max()) > 100.0

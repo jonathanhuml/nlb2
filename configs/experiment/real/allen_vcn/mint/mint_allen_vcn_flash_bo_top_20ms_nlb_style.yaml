@@ -6,7 +6,7 @@ model:
   name: mint
   objective: mint_likelihood_recursion
   dataset: allen_vcn
-  lorenz_library_source: smoothed_spikes
+  library_source: smoothed_spikes
   n_candidates: 2
   window_length: 6
   delta: 1

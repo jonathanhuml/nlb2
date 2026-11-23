@@ -4,7 +4,7 @@ dataset: auto
 train_source: h5
 train_split: auto
 eval_bin_size_ms: 5
-lorenz_library_source: smoothed_spikes
+library_source: smoothed_spikes
 n_candidates: null
 window_length: null
 delta: null

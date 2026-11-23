@@ -30,12 +30,13 @@ config trains LFADS from raw training spikes and fits single-trial rate
 trajectories. DMFC averages prepared condition-indexed trials. This H5
 adapter does not reproduce the original event-warped DMFC NWB procedure.
 Prepared NLB and Allen data use the standard `Experiment` and `nlb2 run`
-fit/save/load workflow. Legacy NWB/MAT adapters remain explicit options.
+fit/save/load workflow. The legacy NWB/MAT adapters (`train_source="nwb"`
+or `"mat"`) run through the dedicated `nlb2.mint_nlb` runner instead.
 
 ## Synthetic datasets
 
 The synthetic Lorenz and chaotic-RNN adapters are NLB2-specific trajectory
-builders. With the default `lorenz_library_source="smoothed_spikes"`, the
+builders. With the default `library_source="smoothed_spikes"`, the
 library is estimated from training spikes by Gaussian smoothing and
 condition averaging. This keeps the comparison non-oracular while still
 matching MINT's assumption that useful trajectory templates are learned
@@ -73,12 +74,13 @@ task-specific reproduction adapters.
 `lfads_epochs` controls the direct `fit_training_data` helper and legacy
 reproduction runners only.
 
-For synthetic Lorenz and chaotic-RNN tasks, NLB2 builds the MINT trajectory
-library from repeated training trials. With `train_source="h5"`, the default
-`lorenz_library_source="smoothed_spikes"` estimates library rates by
-Gaussian-smoothing training spikes and averaging by condition.
-`lorenz_library_source="true_rates"` is an oracle sanity-check mode only
-and should not be used for fair method comparisons.
+For synthetic Lorenz and chaotic-RNN tasks and Allen VCN data, NLB2 builds
+the MINT trajectory library from repeated training trials. With
+`train_source="h5"`, the default `library_source="smoothed_spikes"`
+estimates library rates by Gaussian-smoothing training spikes and averaging
+by condition. `library_source="true_rates"` is an oracle sanity-check mode
+only and should not be used for fair method comparisons. Configs saved with
+the former name `lorenz_library_source` still load.
 The default Lorenz split repeats the same initial-condition trajectories
 across train and validation trials, so this benchmark measures denoising of
 seen trajectories rather than interpolation to unseen trajectories.
@@ -95,7 +97,7 @@ seen trajectories rather than interpolation to unseen trajectories.
 | `mat_data_root` | `Optional[str]` | `None` |
 | `target_h5` | `Optional[str]` | `None` |
 | `eval_bin_size_ms` | `int` | `5` |
-| `lorenz_library_source` | `Literal['smoothed_spikes', 'true_rates']` | `'smoothed_spikes'` |
+| `library_source` | `Literal['smoothed_spikes', 'true_rates']` | `'smoothed_spikes'` |
 | `n_candidates` | `Optional[int]` | `None` |
 | `window_length` | `Optional[int]` | `None` |
 | `delta` | `Optional[int]` | `None` |
