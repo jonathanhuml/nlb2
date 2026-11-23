@@ -1,0 +1,48 @@
+dataset:
+  name: allen_vcn_flash_bo_top
+  data_path: data/real/allen_vcn/allen_vcn_low_trial_20ms.h5
+  group: flash_bo_top
+model:
+  name: ilqr_vae
+  objective: ilqr_vae_elbo
+  params_path: null
+  initialization: checkpoint_transfer
+  template_params_path: data/real/ilqr_vae/final_params.bin
+  random_init_profile: tutorial_mc_maze
+  readout_bias_initialization: empirical_rates
+  empirical_rate_floor_hz: 0.001
+  latent_dim: 90
+  input_dim: 15
+  init_seed: 0
+  solver: ilqr
+  max_iter: 2
+  lr: null
+  differentiate_controls: false
+  trainable_parameters: true
+  n_posterior_samples: 1
+  include_elbo_constants: true
+  dynamics_regularizer: 1.0e-05
+  held_in_neurons: 767
+  output_neuron_start: 767
+  output_neurons: 192
+  rate_mode: likelihood
+  dt: 0.02
+  optimization:
+    name: gradient
+    optimizer: Adam
+    lr: 0.002
+    lr_scheduler: sqrt_decay
+    sqrt_decay_scale: 25.0
+    weight_decay: 0.0
+    gradient_clip: 200.0
+preprocessing:
+  observations: null
+trainer:
+  epochs: 50
+  batch_size: 2
+  device: cpu
+  live_eval_interval: 0
+experiment:
+  output_dir: runs/allen_vcn_nlb_style_20260805_tuned_core_v2/optional_fallback_sweep
+  run_name: ilqr_vae_allen_vcn_flash_bo_top_20ms_nlb_style
+  save_predictions: true

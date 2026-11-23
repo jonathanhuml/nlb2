@@ -4,13 +4,16 @@ from pathlib import Path
 import pytest
 import yaml
 
-from nlb2.cli import main
+from nlb2.cli import CONFIG_ROOT, build_experiment_config, build_parser, main
 from nlb2.config import ExperimentConfig, load_experiment_config
+from nlb2.data import build_dataset_config
 from nlb2.datasets import LorenzDatasetConfig
 from nlb2.experiment import Experiment
 from nlb2.models import GPFAConfig
+from nlb2.models.base import load_model_config
 from nlb2.preprocessing import PreprocessingConfig
 from nlb2.training import TrainerConfig
+from nlb2.utils.yaml import load_yaml
 
 
 def test_experiment_writes_run_artifacts(tmp_path: Path):
@@ -46,10 +49,10 @@ def test_experiment_writes_run_artifacts(tmp_path: Path):
     assert result.predictions_path is not None
     assert result.predictions_path.exists()
     assert result.report_path.exists()
-    assert (result.run_dir / "plots" / "train_test_objective_curves.png").exists()
-    assert (result.run_dir / "plots" / "test_objective_curves.png").exists()
-    assert result.plot_paths["train_test_objective"].exists()
-    assert result.plot_paths["test_objective"].exists()
+    assert (result.run_dir / "plots" / "train_valid_objective_curves.png").exists()
+    assert (result.run_dir / "plots" / "valid_objective_curves.png").exists()
+    assert result.plot_paths["train_valid_objective"].exists()
+    assert result.plot_paths["valid_objective"].exists()
     assert "co_bps" in result.metrics
     assert "rate_mse" in result.metrics
 
@@ -210,6 +213,32 @@ def test_cli_validates_all_configs_before_training(tmp_path: Path):
         main(["run", "-c", str(valid_path), str(invalid_path), "--output-dir", str(output_dir)])
 
     assert not output_dir.exists()
+
+
+def test_cli_defaults_run_repository_recipe_from_any_directory(tmp_path: Path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    args = build_parser().parse_args(["run", "--epochs", "3", "--batch-size", "8"])
+    assert (args.dataset, args.model) == ("lorenz", "lfads")
+
+    config = build_experiment_config(args)
+    recipe = load_experiment_config(
+        str(CONFIG_ROOT / "experiment" / "synthetic" / "lorenz" / "lfads" / "lfads_lorenz.yaml")
+    )
+    assert config.dataset == recipe.dataset
+    assert config.model == recipe.model
+    assert config.preprocessing == recipe.preprocessing
+    assert config.trainer.epochs == 3
+    assert config.batch_size == 8
+
+
+def test_cli_defaults_without_recipe_use_model_and_dataset_configs(tmp_path: Path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    config = build_experiment_config(build_parser().parse_args(["run", "-d", "lorenz", "-m", "stndt"]))
+
+    assert config.model == load_model_config(str(CONFIG_ROOT / "model" / "stndt.yaml"))
+    assert config.dataset == build_dataset_config(
+        "lorenz", load_yaml(str(CONFIG_ROOT / "dataset" / "lorenz.yaml"))
+    )
 
 
 def test_cli_requires_one_config_when_resuming():

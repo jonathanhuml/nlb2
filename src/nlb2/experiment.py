@@ -566,36 +566,36 @@ def _write_history_plots(run_dir: Path, history: list[EpochReport]) -> dict[str,
     )
 
     plot_paths: dict[str, Path] = {}
-    train_test_path = plots_dir / "train_test_objective_curves.png"
+    train_valid_path = plots_dir / "train_valid_objective_curves.png"
     with plot_context(nrows=1, ncols=1, rel_width=0.86, height_scale=1.35):
         # Render saved artifacts without changing the caller's display backend.
         fig = Figure()
         FigureCanvasAgg(fig)
         ax = fig.subplots()
         _plot_finite_curve(ax, epochs, train_loss, label="train", linestyle="--")
-        _plot_finite_curve(ax, epochs, valid_loss, label="test", linestyle="-")
+        _plot_finite_curve(ax, epochs, valid_loss, label="validation", linestyle="-")
         ax.set_xlabel("Epoch")
         ax.set_ylabel("Loss")
-        ax.set_title("Train and Test Objective")
+        ax.set_title("Train and Validation Objective")
         style_axis(ax)
         ax.legend()
-        save_figure(fig, train_test_path)
-    plot_paths["train_test_objective"] = train_test_path
+        save_figure(fig, train_valid_path)
+    plot_paths["train_valid_objective"] = train_valid_path
 
     if np.isfinite(valid_loss).any():
-        test_path = plots_dir / "test_objective_curves.png"
+        valid_path = plots_dir / "valid_objective_curves.png"
         with plot_context(nrows=1, ncols=1, rel_width=0.86, height_scale=1.35):
             fig = Figure()
             FigureCanvasAgg(fig)
             ax = fig.subplots()
-            _plot_finite_curve(ax, epochs, valid_loss, label="test", linestyle="-")
+            _plot_finite_curve(ax, epochs, valid_loss, label="validation", linestyle="-")
             ax.set_xlabel("Epoch")
             ax.set_ylabel("Loss")
-            ax.set_title("Test Objective")
+            ax.set_title("Validation Objective")
             style_axis(ax)
             ax.legend()
-            save_figure(fig, test_path)
-        plot_paths["test_objective"] = test_path
+            save_figure(fig, valid_path)
+        plot_paths["valid_objective"] = valid_path
 
     return plot_paths
 

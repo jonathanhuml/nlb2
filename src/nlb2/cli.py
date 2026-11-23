@@ -26,6 +26,11 @@ from nlb2.preprocessing import PreprocessingConfig
 from nlb2.training import TrainerConfig
 from nlb2.utils.yaml import load_yaml
 
+# Repository configs, found from the package location so `-d/-m` resolves the
+# same files from any working directory. Wheel installs have none, so built-in
+# defaults apply.
+CONFIG_ROOT = Path(__file__).resolve().parents[2] / "configs"
+
 
 def main(argv: list[str] | None = None) -> int:
     """Run the NLB2 CLI."""
@@ -52,10 +57,14 @@ def build_parser() -> argparse.ArgumentParser:
     run_parser = subparsers.add_parser(
         "run",
         help="run one or more experiments",
-        description="Run NLB2 experiments sequentially, saving a separate folder for each run.",
+        description=(
+            "Run NLB2 experiments sequentially, saving a separate folder for each run. "
+            "Without -c, -d/-m run the repository recipe for that dataset and model, "
+            "or configs/dataset and configs/model defaults when there is no recipe."
+        ),
     )
     run_parser.add_argument("-d", "--dataset", default="lorenz", help="dataset name")
-    run_parser.add_argument("-m", "--model", default="cassm", help="model name")
+    run_parser.add_argument("-m", "--model", default="lfads", help="model name")
     run_parser.add_argument(
         "-c", "--config", nargs="+", metavar="CONFIG",
         help="one or more experiment YAML recipes or saved config.json files",
@@ -275,12 +284,7 @@ def build_experiment_config(args: argparse.Namespace) -> ExperimentConfig:
     if config_path:
         config = load_experiment_config(config_path)
     else:
-        config = ExperimentConfig(
-            dataset=_load_dataset_config(args.dataset, args.dataset_config),
-            model=_load_model_config(args.model, args.model_config),
-            trainer=TrainerConfig(),
-            preprocessing=_load_default_preprocessing(args.dataset, args.model),
-        )
+        config = _default_experiment_config(args)
 
     trainer = config.trainer
     if args.epochs is not None:
@@ -302,9 +306,38 @@ def build_experiment_config(args: argparse.Namespace) -> ExperimentConfig:
     )
 
 
+def _default_experiment_config(args: argparse.Namespace) -> ExperimentConfig:
+    """Build a `-d/-m` run from the repository recipe for that pair, if any.
+
+    Without a recipe, the dataset and model come from `configs/dataset` and
+    `configs/model`, or built-in defaults. --dataset-config and --model-config
+    replace the matching block either way.
+    """
+
+    recipe = _default_experiment_config_path(args.dataset, args.model)
+    if recipe is not None:
+        print(f"Using recipe {recipe.relative_to(CONFIG_ROOT.parent)}", flush=True)
+        config = load_experiment_config(str(recipe))
+    else:
+        config = ExperimentConfig(
+            dataset=_load_dataset_config(args.dataset, None),
+            model=_load_model_config(args.model, None),
+            trainer=TrainerConfig(),
+            preprocessing=PreprocessingConfig(),
+        )
+    if args.dataset_config:
+        config = replace(config, dataset=_load_dataset_config(args.dataset, args.dataset_config))
+    if args.model_config:
+        config = replace(config, model=_load_model_config(args.model, args.model_config))
+    return config
+
+
 def _load_dataset_config(name: str, path: str | None) -> object:
     if path is None:
-        return build_dataset_config(name)
+        default = CONFIG_ROOT / "dataset" / f"{name}.yaml"
+        if not default.is_file():
+            return build_dataset_config(name)
+        path = str(default)
     data = load_yaml(path)
     dataset_name = data.get("name", name)
     return build_dataset_config(dataset_name, data)
@@ -318,28 +351,19 @@ def _load_model_config(name: str, path: str | None) -> BaseModelConfig:
     if name not in BaseModelConfig.registry:
         known = ", ".join(sorted(BaseModelConfig.registry)) or "<none>"
         raise KeyError(f"Unknown model '{name}'. Registered models: {known}.")
+    default = CONFIG_ROOT / "model" / f"{name}.yaml"
+    if default.is_file():
+        return load_model_config(str(default))
     return BaseModelConfig.registry[name]()
 
 
-def _load_default_preprocessing(dataset: str, model: str) -> PreprocessingConfig:
-    path = _default_experiment_config_path(dataset, model)
-    if not path.exists():
-        return PreprocessingConfig()
-    data = load_yaml(path)
-    return PreprocessingConfig.model_validate(data.get("preprocessing", {}))
-
-
-def _default_experiment_config_path(dataset: str, model: str) -> Path:
-    root = Path("configs") / "experiment"
+def _default_experiment_config_path(dataset: str, model: str) -> Path | None:
+    root = CONFIG_ROOT / "experiment"
     candidates = [
         root / "synthetic" / dataset / model / f"{model}_{dataset}.yaml",
         root / "real" / dataset / model / f"{model}_{dataset}.yaml",
-        root / f"{model}_{dataset}.yaml",
     ]
-    for path in candidates:
-        if path.exists():
-            return path
-    return candidates[0]
+    return next((path for path in candidates if path.is_file()), None)
 
 
 def _is_help_request(argv: list[str]) -> bool:

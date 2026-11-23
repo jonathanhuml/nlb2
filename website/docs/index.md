@@ -14,8 +14,11 @@ latent variable models of neural dynamics.
 Run a full NLB2 experiment with:
 
 ```bash
-nlb2 run -d lorenz -m cassm
+nlb2 run -d lorenz -m lfads --device cpu --epochs 20
 ```
+
+`-d` and `-m` run the repository recipe for that dataset and model, here
+`configs/experiment/synthetic/lorenz/lfads/lfads_lorenz.yaml`.
 
 The public registries include synthetic datasets such as `lorenz` and
 `chaotic_rnn`, plus model entries such as `ilqr_vae`, `lfads`, and `ndt`.

@@ -10,6 +10,8 @@ venv/
 dist/
 build/
 runs/
+# Local mkdocs output; CI builds and deploys the site itself.
+/website/site/
 # Local scratch and experiment tooling.
 /scripts/
 *.npy
