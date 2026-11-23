@@ -1,0 +1,31 @@
+dataset:
+  name: allen_vcn_flash_fc_second
+  data_path: data/real/allen_vcn/allen_vcn_low_trial_20ms.h5
+  group: flash_fc_second
+model:
+  name: mint
+  objective: mint_likelihood_recursion
+  dataset: allen_vcn
+  lorenz_library_source: smoothed_spikes
+  n_candidates: 2
+  window_length: 6
+  delta: 1
+  sigma: 2
+  min_rate: 0.0001
+  causal: false
+  optimization:
+    name: library_fit
+  allen_condition_mode: trial_index
+  train_source: lfads
+  interp: 2
+preprocessing:
+  observations: null
+trainer:
+  epochs: 25
+  batch_size: 8
+  device: cpu
+  live_eval_interval: 0
+experiment:
+  output_dir: runs
+  run_name: mint_allen_vcn_flash_fc_second_20ms_nlb_style
+  save_predictions: true

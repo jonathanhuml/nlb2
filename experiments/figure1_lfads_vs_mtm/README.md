@@ -46,6 +46,15 @@ With the inputs fetched, it also re-checks that none of the 29 sessions is in Mt
 ## Full re-run
 
 You need one CUDA GPU, about 8 GB of inputs and about 70 GB of free disk for intermediate files.
+Recreate the reference environment (Python 3.14) first. `--no-deps` installs NLB2 on top of the
+pinned versions without changing any of them:
+
+```sh
+pip install -r environment/requirements-hal.txt --extra-index-url https://download.pytorch.org/whl/cu130
+pip install --no-deps -e ../..
+```
+
+Then:
 
 ```sh
 make fetch          # 29 sessions (S3), MtM checkpoint (Hugging Face, SHA-256 checked), ibl-bwb at the pinned commit
@@ -114,3 +123,9 @@ are in the lockfiles, so an archived copy can be checked against this record.
 - `brainbench-org/ibl-bwb` commit `d30ec9c` for the MtM model code and data utilities.
 - MtM checkpoint `nerdslab/ibl-bwb-mtm`, SHA-256 `cb107873…7721`.
 - Reference machine: Python 3.14.4, torch 2.14.1+cu130, NVIDIA driver 595.91.07.
+
+The `environment/requirements-*.txt` files are `pip freeze` records of the two machines and are
+kept exactly as recorded. They do not list NLB2, because Stage 1 imported the source snapshot
+rather than an installed package. They also do not list nlb-tools, which Figure 1 does not use.
+Their pandas 3.1.1 satisfies NLB2's core requirements. Only NLB2's optional `nlb` extra keeps
+pandas below 3, for nlb-tools.

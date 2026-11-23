@@ -3,7 +3,8 @@
 import numpy as np
 import pandas as pd
 import pytest
-from nlb_tools.nwb_interface import NWBDataset
+
+NWBDataset = pytest.importorskip("nlb_tools.nwb_interface").NWBDataset
 
 from nlb2.datasets._nlb_resample import resample_nwb_dataset
 

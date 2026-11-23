@@ -32,12 +32,22 @@ Install from the repository root, including plotting dependencies:
 python -m pip install -e ".[benchmarks]"
 ```
 
-With a CUDA-enabled PyTorch installation, train GPFA on synthetic Lorenz data:
+Working with NLB datasets (data preparation and full `nlb_tools` scoring) also
+needs `nlb-tools`. Its PyPI releases pin `pandas<=1.3.4`, so install it without
+dependencies on top of the `nlb` extra:
 
 ```bash
-nlb2 run -d lorenz -m gpfa --device cuda \
+python -m pip install -e ".[benchmarks,nlb]"
+python -m pip install --no-deps nlb-tools
+```
+
+Train LFADS on synthetic Lorenz data. This takes about 10 seconds on a laptop
+CPU; pass `--device cuda` to use a GPU:
+
+```bash
+nlb2 run -d lorenz -m lfads --device cpu \
   --epochs 20 --batch-size 8 --live-eval-interval 5 \
-  --run-name gpfa_lorenz
+  --run-name lfads_lorenz
 ```
 
 This generates data locally, reports training and validation losses, and
@@ -45,12 +55,13 @@ evaluates reconstruction metrics every five epochs. Each run saves its resolved
 configuration, learning history, fitted model, metrics, and predictions under
 `runs/`.
 
-Use a YAML recipe to specify the full experiment, with CLI overrides for the
-device and training budget:
+`-d` and `-m` run the repository recipe for that dataset and model, here
+`configs/experiment/synthetic/lorenz/lfads/lfads_lorenz.yaml`. Use `-c` to run
+any YAML recipe, with CLI overrides for the device and training budget:
 
 ```bash
-nlb2 run -c configs/experiment/synthetic/lorenz/gpfa/gpfa_lorenz.yaml \
-  --device cuda --epochs 20
+nlb2 run -c configs/experiment/synthetic/lorenz/lfads/lfads_lorenz.yaml \
+  --device cpu --epochs 20
 ```
 
 ## Capabilities
@@ -83,9 +94,10 @@ use the same experiment configuration and execution path:
 from nlb2 import Experiment
 
 experiment = Experiment.from_config_path(
-    "configs/experiment/synthetic/lorenz/gpfa/gpfa_lorenz.yaml"
+    "configs/experiment/synthetic/lorenz/lfads/lfads_lorenz.yaml"
 )
-experiment.config.trainer.device = "cuda"
+experiment.config.trainer.device = "cpu"
+experiment.config.trainer.epochs = 20
 result = experiment.run()
 print(result.metrics)
 ```

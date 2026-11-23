@@ -53,6 +53,10 @@ NLB_BIN_SIZES_MS: tuple[int, ...] = (5, 20)
 NLB_TARGET_H5_URL = (
     "https://media.githubusercontent.com/media/neurallatents/nlb_tools/main/data/eval_data_test.h5"
 )
+_NLB_TOOLS_MISSING = (
+    "nlb_tools is required to build NLB tensors from NWB. Install it with "
+    "`pip install -e \".[nlb]\"` and `pip install --no-deps nlb-tools`."
+)
 
 DATASET_TO_DANDISET: dict[str, str] = {
     "area2_bump": "000127",
@@ -608,7 +612,7 @@ def _prepare_validation_h5(
             )
             from nlb_tools.nwb_interface import NWBDataset
         except ImportError as exc:
-            raise RuntimeError("nlb_tools is required to build NLB tensors from NWB.") from exc
+            raise RuntimeError(_NLB_TOOLS_MISSING) from exc
 
         dataset_obj = NWBDataset(nwb_path)
         resample_nwb_dataset(dataset_obj, bin_size_ms)
@@ -660,7 +664,7 @@ def _build_train_tensors(
             from nlb_tools.make_tensors import make_train_input_tensors
             from nlb_tools.nwb_interface import NWBDataset
         except ImportError as exc:
-            raise RuntimeError("nlb_tools is required to build NLB tensors from NWB.") from exc
+            raise RuntimeError(_NLB_TOOLS_MISSING) from exc
 
         dataset_obj = NWBDataset(nwb_path)
         resample_nwb_dataset(dataset_obj, bin_size_ms)
@@ -691,7 +695,7 @@ def _build_eval_heldin(
             from nlb_tools.make_tensors import make_eval_input_tensors
             from nlb_tools.nwb_interface import NWBDataset
         except ImportError as exc:
-            raise RuntimeError("nlb_tools is required to build NLB tensors from NWB.") from exc
+            raise RuntimeError(_NLB_TOOLS_MISSING) from exc
 
         dataset_obj = NWBDataset(nwb_path)
         resample_nwb_dataset(dataset_obj, bin_size_ms)
